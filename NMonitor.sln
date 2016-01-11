@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMonitor.LogsEmitor", "NMonitor.LogsEmitor\NMonitor.LogsEmitor.csproj", "{6154EC5D-3632-4C6B-86CF-A96A2E676AED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMonitor.WPF", "NMonitor.WPF\NMonitor.WPF.csproj", "{A168B41F-9FCA-4A64-B975-D0C4EFE73B6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMonitor", "NMonitor\NMonitor.csproj", "{BE38B199-E468-42CB-B8EE-6404F48A53AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6154EC5D-3632-4C6B-86CF-A96A2E676AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6154EC5D-3632-4C6B-86CF-A96A2E676AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6154EC5D-3632-4C6B-86CF-A96A2E676AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6154EC5D-3632-4C6B-86CF-A96A2E676AED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A168B41F-9FCA-4A64-B975-D0C4EFE73B6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A168B41F-9FCA-4A64-B975-D0C4EFE73B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A168B41F-9FCA-4A64-B975-D0C4EFE73B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A168B41F-9FCA-4A64-B975-D0C4EFE73B6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE38B199-E468-42CB-B8EE-6404F48A53AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE38B199-E468-42CB-B8EE-6404F48A53AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE38B199-E468-42CB-B8EE-6404F48A53AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE38B199-E468-42CB-B8EE-6404F48A53AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
