@@ -108,6 +108,7 @@
       <DependentUpon>SettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\CollectionStatus.cs" />
+    <Compile Include="ViewModels\LogCollectionFilterViewModel.cs" />
     <Compile Include="ViewModels\LogCollectionViewModel.cs" />
     <Compile Include="ViewModels\RabbitMQConfigurationViewModel.cs" />
     <Page Include="MainWindow.xaml">

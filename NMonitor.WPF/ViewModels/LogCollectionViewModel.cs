@@ -15,17 +15,11 @@
 ******************************************************************************/
 
 using ReactiveUI;
-using System;
-using System.Reactive.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Threading;
-using System.Security;
-using System.Runtime.InteropServices;
 using Splat;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace NMonitor.WPF.ViewModels
 {
@@ -48,7 +42,14 @@ namespace NMonitor.WPF.ViewModels
 		{
 			this.Parameters = new RabbitMQConfigurationViewModel();
 			this.Status = CollectionStatus.NotConnected;
-			this.Loggers = new ReactiveList<string>() { string.Empty };
+			this.Loggers = new ReactiveList<LogCollectionFilterViewModel<string>>();
+			this.LogLevels = new List<LogCollectionFilterViewModel<LogLevel>>()
+			{
+				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Info, "Info", false),
+				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Warn, "Warn", true),
+				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Error, "Error", true),
+				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Fatal, "Fatal", true),
+			};
 
 			this.logs = new ReactiveList<LogEntry>()
 			{
@@ -61,10 +62,11 @@ namespace NMonitor.WPF.ViewModels
 			});
 			this.logs.ItemsAdded.Subscribe(l =>
 			{
-				if (!this.Loggers.Contains(l.Logger))
-					this.Loggers.Add(l.Logger);
+				if (!this.Loggers.Any(il => il.Value == l.Logger))
+					this.Loggers.Add(new LogCollectionFilterViewModel<string>(l.Logger, l.Logger, true));
 			});
-			this.Logs = this.logs.CreateDerivedCollection(l => l, this.IsFiltered);
+			this.Logs = this.logs.CreateDerivedCollection(l => l, e => this.Loggers.Any(l => string.CompareOrdinal(l.Value, e.Logger) == 0)
+																			&& this.LogLevels.Any(l => l.Value == e.Level));
 			
 			this.WhenAnyValue(
 				t => t.Parameters.Host,
@@ -85,21 +87,19 @@ namespace NMonitor.WPF.ViewModels
 				.Throttle(TimeSpan.FromSeconds(5))
 				.ObserveOnDispatcher()
 				.Subscribe(this.ConnectToLogCollection);
-
-			this.WhenAnyValue(
-				t => t.ShowInfo,
-				t => t.ShowWarn,
-				t => t.ShowError,
-				t => t.ShowFatal,
-				t => t.Logger)
-				.ObserveOnDispatcher()
-				.Subscribe(x => this.Logs.Reset());
+			
+			//this.WhenAnyValue(
+			//	t => t.ShowInfo,
+			//	t => t.ShowWarn,
+			//	t => t.ShowError,
+			//	t => t.ShowFatal,
+			//	t => t.Logger)
+			//	.ObserveOnDispatcher()
+			//	.Subscribe(x => this.Logs.Reset());
 		}
 
 		public IReactiveDerivedList<LogEntry> Logs { get; private set; }
-
-		public ReactiveList<string> Loggers { get; private set; }
-
+		
 		public RabbitMQConfigurationViewModel Parameters { get; set; }
 
 		public CollectionStatus Status
@@ -108,35 +108,9 @@ namespace NMonitor.WPF.ViewModels
 			set { this.RaiseAndSetIfChanged(ref this.status, value); }
 		}
 
-		public bool ShowInfo
-		{
-			get { return this.showInfo; }
-			set { this.RaiseAndSetIfChanged(ref this.showInfo, value); }
-		}
+		public ReactiveList<LogCollectionFilterViewModel<string>> Loggers { get; private set; }
 
-		public bool ShowWarn
-		{
-			get { return this.showWarn; }
-			set { this.RaiseAndSetIfChanged(ref this.showWarn, value); }
-		}
-
-		public bool ShowError
-		{
-			get { return this.showError; }
-			set { this.RaiseAndSetIfChanged(ref this.showError, value); }
-		}
-
-		public bool ShowFatal
-		{
-			get { return this.showFatal; }
-			set { this.RaiseAndSetIfChanged(ref this.showFatal, value); }
-		}
-
-		public string Logger
-		{
-			get { return this.logger; }
-			set { this.RaiseAndSetIfChanged(ref this.logger, value); }
-		}
+		public List<LogCollectionFilterViewModel<LogLevel>> LogLevels { get; private set; }
 
 		public void Dispose()
 		{
@@ -163,30 +137,6 @@ namespace NMonitor.WPF.ViewModels
 			catch (Exception e)
 			{
 				this.Status = CollectionStatus.FailedToConnect;
-			}
-		}
-
-		private bool IsFiltered(LogEntry entry)
-		{
-			if (!string.IsNullOrEmpty(this.Logger) && string.CompareOrdinal(entry.Logger, this.Logger) != 0)
-				return false;
-
-			switch (entry.Level)
-			{
-				case LogLevel.Info:
-					return this.ShowInfo;
-
-				case LogLevel.Warn:
-					return this.ShowWarn;
-
-				case LogLevel.Error:
-					return this.ShowError;
-
-				case LogLevel.Fatal:
-					return this.ShowFatal;
-
-				default:
-					return false;
 			}
 		}
 	}

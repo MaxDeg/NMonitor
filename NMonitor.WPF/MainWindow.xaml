@@ -142,7 +142,27 @@
 							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
 
-						<ComboBox ItemsSource="{Binding Loggers}" SelectedItem="{Binding Logger}"></ComboBox>
+						<Controls:DropDownButton ItemsSource="{Binding Loggers}" VerticalContentAlignment="Center">
+							<Controls:DropDownButton.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+										<TextBlock Text="{Binding Label}" />
+									</StackPanel>
+								</DataTemplate>
+							</Controls:DropDownButton.ItemTemplate>
+						</Controls:DropDownButton>
+
+						<!--<ComboBox ItemsSource="{Binding Loggers}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+										<TextBlock Text="{Binding Label}" />
+									</StackPanel>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>-->
 
 						<StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
 							<CheckBox Content="Info" Margin="10,5" IsChecked="{Binding ShowInfo, Mode=TwoWay}" />

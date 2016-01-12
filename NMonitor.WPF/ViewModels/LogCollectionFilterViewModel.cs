@@ -14,36 +14,37 @@
     limitations under the License.
 ******************************************************************************/
 
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace NMonitor.WPF
+namespace NMonitor.WPF.ViewModels
 {
-	/// <summary>
-	/// Interaction logic for SettingsControl.xaml
-	/// </summary>
-	public partial class SettingsControl : UserControl
+	public class LogCollectionFilterViewModel<TValue> : ReactiveObject
 	{
-		public SettingsControl()
+		private bool isSelected;
+
+		public LogCollectionFilterViewModel(TValue value, string label)
+			: this(value, label, false) { }
+
+		public LogCollectionFilterViewModel(TValue value, string label, bool isSelected)
 		{
-			InitializeComponent();
+			this.Value = value;
+			this.Label = label;
+			this.isSelected = isSelected;
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
+		public TValue Value { get; private set; }
+
+		public string Label { get; private set; }
+
+		public bool IsSelected
 		{
-			this.Visibility = Visibility.Collapsed;
+			get { return this.isSelected; }
+			set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
 		}
 	}
 }
