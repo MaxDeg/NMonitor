@@ -14,17 +14,18 @@
     limitations under the License.
 ******************************************************************************/
 
+using ReactiveUI;
 
 namespace NMonitor
 {
-    public sealed class RabbitMqParameters
-    {
-        public string Host { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+	public sealed class RabbitMqParameters
+	{
+		public string Host { get; set; }
+		public string UserName { get; set; }
+		public string Password { get; set; }
 
-        public string Exchange { get; set; }
-        public string ExchangeType { get; set; }
-        public string RoutingKey { get; set; }
-    }
+		public string Exchange { get; set; }
+		public string ExchangeType { get; set; }
+		public string RoutingKey { get; set; }
+	}
 }

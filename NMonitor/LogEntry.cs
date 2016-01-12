@@ -14,6 +14,7 @@
     limitations under the License.
 ******************************************************************************/
 
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace NMonitor
 {
     public class LogEntry
     {
-        public string Level { get; set; }
+        public LogLevel Level { get; set; }
         public string Time { get; set; }
         public string Logger { get; set; }
         public string Message { get; set; }

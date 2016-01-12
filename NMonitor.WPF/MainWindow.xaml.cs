@@ -38,10 +38,19 @@ namespace NMonitor.WPF
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+		public LogCollectionViewModel ViewModel { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new LogCollectionViewModel(this.Dispatcher);
+
+			this.ViewModel = new LogCollectionViewModel();
+			this.DataContext = this.ViewModel;
         }
-    }
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			this.settingsPane.Visibility = this.settingsPane.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+		}
+	}
 }

@@ -9,108 +9,178 @@
                       xmlns:liveCharts="clr-namespace:LiveCharts;assembly=LiveCharts"
                       xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase" 
                       xmlns:local="clr-namespace:NMonitor.WPF"
+					  xmlns:helpers="clr-namespace:NMonitor.WPF.Helpers"
                       mc:Ignorable="d"
-                      Title="MainWindow" Height="400" Width="750"                      
+					  Icon="charts.ico"
+                      Title="NMonitor" Height="400" Width="750"                      
                       BorderBrush="{DynamicResource AccentColorBrush}"
                       BorderThickness="1" 
                       ResizeMode="CanResizeWithGrip"
+					  ShowTitleBar="True"
                       WindowStartupLocation="CenterScreen">
 
-    <Controls:MetroWindow.Resources>
-        <ResourceDictionary>
-            <CollectionViewSource x:Key="Logs" Source="{Binding Logs}">
-                <CollectionViewSource.SortDescriptions>
-                    <scm:SortDescription Direction="Descending" />
-                </CollectionViewSource.SortDescriptions>
-            </CollectionViewSource>
-        </ResourceDictionary>
-    </Controls:MetroWindow.Resources>
+	<Controls:MetroWindow.Resources>
+		<ResourceDictionary>
+			<helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+			<helpers:EnumToBoolConverter x:Key="EnumToBool"/>
+			<helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
 
-    <Grid Margin="10">
-        <Controls:MetroAnimatedSingleRowTabControl TabStripPlacement="Left" TabStripMargin="10,0">
+			<CollectionViewSource x:Key="Logs" Source="{Binding Logs}">
+				<CollectionViewSource.SortDescriptions>
+					<scm:SortDescription Direction="Descending" />
+				</CollectionViewSource.SortDescriptions>
+			</CollectionViewSource>
+		</ResourceDictionary>
+	</Controls:MetroWindow.Resources>
 
-            <Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20">
+	<Controls:MetroWindow.RightWindowCommands>
+		<Controls:WindowCommands>
+			<Button Click="Button_Click">
+				<Rectangle Width="16" Height="16" 
+						   Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+					<Rectangle.OpacityMask>
+						<VisualBrush Stretch="Fill" Visual="{StaticResource appbar_settings}" />
+					</Rectangle.OpacityMask>
+				</Rectangle>
+			</Button>
+		</Controls:WindowCommands>
+	</Controls:MetroWindow.RightWindowCommands>
 
-                <WrapPanel>
-                    <liveCharts:LineChart AreaOpacity=".1" LineType="Polyline" Width="350" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <liveCharts:LineChart.Series>
-                            <liveCharts:LineSeries Title="Maria" 
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"></RowDefinition>
+			<RowDefinition Height="Auto"></RowDefinition>
+		</Grid.RowDefinitions>
+
+		<Controls:MetroAnimatedSingleRowTabControl TabStripPlacement="Left" TabStripMargin="10,0" Margin="10">
+
+			<Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20">
+
+				<WrapPanel>
+					<liveCharts:LineChart AreaOpacity=".1" LineType="Polyline" Width="350" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+						<liveCharts:LineChart.Series>
+							<liveCharts:LineSeries Title="Maria" 
                                   PrimaryValues="20, 40, 45, 60, 55, 60, 65, 70" 
                                   PointRadius="0" 
                                     Stroke="#FFB300"      
                                     Fill="#19FFB300"   
                                   StrokeThickness="1"></liveCharts:LineSeries>
-                            <liveCharts:LineSeries Title="John" 
+							<liveCharts:LineSeries Title="John" 
                                   PrimaryValues="30, 35, 43, 68, 65 ,70, 55, 60"
                                   PointRadius="0"
                                     Stroke="#FFA000"  
                                     Fill="#2AFFA000" 
                                   StrokeThickness="1"></liveCharts:LineSeries>
-                            <liveCharts:LineSeries Title="Erick" 
+							<liveCharts:LineSeries Title="Erick" 
                                   PrimaryValues="40, 42, 50, 70, 50, 55, 44, 73" 
                                   PointRadius="0" 
                                     Stroke="#FF8F00"  
                                     Fill="#2AFF8F00" 
                                   StrokeThickness="1"></liveCharts:LineSeries>
-                        </liveCharts:LineChart.Series>
-                        <liveCharts:LineChart.PrimaryAxis>
-                            <liveCharts:Axis Foreground="White" FontSize="10">
-                                <liveCharts:Axis.Separator>
-                                    <liveCharts:Separator Color="#404040" Thickness="1" Enabled="True"></liveCharts:Separator>
-                                </liveCharts:Axis.Separator>
-                            </liveCharts:Axis>
-                        </liveCharts:LineChart.PrimaryAxis>
-                        <liveCharts:LineChart.SecondaryAxis>
-                            <liveCharts:Axis FontSize="10" Labels="Jan, Feb, Mar, Apr, May, Jun, Ago, Sep, Oct, Nov, Dec">
-                                <liveCharts:Axis.Separator>
-                                    <liveCharts:Separator Enabled="False"></liveCharts:Separator>
-                                </liveCharts:Axis.Separator>
-                            </liveCharts:Axis>
-                        </liveCharts:LineChart.SecondaryAxis>
-                    </liveCharts:LineChart>
-                    <liveCharts:LineChart AreaOpacity=".1" LineType="Polyline" Width="350" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <liveCharts:LineChart.Series>
-                            <liveCharts:LineSeries Title="Maria" 
+						</liveCharts:LineChart.Series>
+						<liveCharts:LineChart.PrimaryAxis>
+							<liveCharts:Axis Foreground="White" FontSize="10">
+								<liveCharts:Axis.Separator>
+									<liveCharts:Separator Color="#404040" Thickness="1" Enabled="True"></liveCharts:Separator>
+								</liveCharts:Axis.Separator>
+							</liveCharts:Axis>
+						</liveCharts:LineChart.PrimaryAxis>
+						<liveCharts:LineChart.SecondaryAxis>
+							<liveCharts:Axis FontSize="10" Labels="Jan, Feb, Mar, Apr, May, Jun, Ago, Sep, Oct, Nov, Dec">
+								<liveCharts:Axis.Separator>
+									<liveCharts:Separator Enabled="False"></liveCharts:Separator>
+								</liveCharts:Axis.Separator>
+							</liveCharts:Axis>
+						</liveCharts:LineChart.SecondaryAxis>
+					</liveCharts:LineChart>
+					<liveCharts:LineChart AreaOpacity=".1" LineType="Polyline" Width="350" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+						<liveCharts:LineChart.Series>
+							<liveCharts:LineSeries Title="Maria" 
                           PrimaryValues="20, 40, 45, 60, 55, 60, 65, 70" 
                           PointRadius="0" 
                           StrokeThickness="1"></liveCharts:LineSeries>
-                            <liveCharts:LineSeries Title="John" 
+							<liveCharts:LineSeries Title="John" 
                           PrimaryValues="30, 35, 43, 68, 65 ,70, 55, 60"
                           PointRadius="0"
                           StrokeThickness="1"></liveCharts:LineSeries>
-                            <liveCharts:LineSeries Title="Erick" 
+							<liveCharts:LineSeries Title="Erick" 
                           PrimaryValues="40, 42, 50, 70, 50, 55, 44, 73" 
                           PointRadius="0" 
                           StrokeThickness="1"></liveCharts:LineSeries>
-                        </liveCharts:LineChart.Series>
-                        <liveCharts:LineChart.PrimaryAxis>
-                            <liveCharts:Axis Foreground="White" FontSize="10">
-                                <liveCharts:Axis.Separator>
-                                    <liveCharts:Separator Color="#404040" Thickness="1" Enabled="True"></liveCharts:Separator>
-                                </liveCharts:Axis.Separator>
-                            </liveCharts:Axis>
-                        </liveCharts:LineChart.PrimaryAxis>
-                        <liveCharts:LineChart.SecondaryAxis>
-                            <liveCharts:Axis FontSize="10" Labels="Jan, Feb, Mar, Apr, May, Jun, Ago, Sep, Oct, Nov, Dec">
-                                <liveCharts:Axis.Separator>
-                                    <liveCharts:Separator Enabled="False"></liveCharts:Separator>
-                                </liveCharts:Axis.Separator>
-                            </liveCharts:Axis>
-                        </liveCharts:LineChart.SecondaryAxis>
-                    </liveCharts:LineChart>
-                </WrapPanel>
+						</liveCharts:LineChart.Series>
+						<liveCharts:LineChart.PrimaryAxis>
+							<liveCharts:Axis Foreground="White" FontSize="10">
+								<liveCharts:Axis.Separator>
+									<liveCharts:Separator Color="#404040" Thickness="1" Enabled="True"></liveCharts:Separator>
+								</liveCharts:Axis.Separator>
+							</liveCharts:Axis>
+						</liveCharts:LineChart.PrimaryAxis>
+						<liveCharts:LineChart.SecondaryAxis>
+							<liveCharts:Axis FontSize="10" Labels="Jan, Feb, Mar, Apr, May, Jun, Ago, Sep, Oct, Nov, Dec">
+								<liveCharts:Axis.Separator>
+									<liveCharts:Separator Enabled="False"></liveCharts:Separator>
+								</liveCharts:Axis.Separator>
+							</liveCharts:Axis>
+						</liveCharts:LineChart.SecondaryAxis>
+					</liveCharts:LineChart>
+				</WrapPanel>
 
-            </Controls:MetroTabItem>
+			</Controls:MetroTabItem>
 
-            <Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" BorderBrush="{x:Null}" IsSelected="True">
+			<Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" BorderBrush="{x:Null}" IsSelected="True">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
 
-                <DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}"
-                          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10" CanUserAddRows="False" 
-                          CanUserSortColumns="False" GridLinesVisibility="Horizontal">
-                </DataGrid>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="100"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
 
-            </Controls:MetroTabItem>
+						<ComboBox ItemsSource="{Binding Loggers}" SelectedItem="{Binding Logger}"></ComboBox>
 
-        </Controls:MetroAnimatedSingleRowTabControl>
-    </Grid>
+						<StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
+							<CheckBox Content="Info" Margin="10,5" IsChecked="{Binding ShowInfo, Mode=TwoWay}" />
+							<CheckBox Content="Warn" Margin="10,5" IsChecked="{Binding ShowWarn, Mode=TwoWay}" />
+							<CheckBox Content="Error" Margin="10,5" IsChecked="{Binding ShowError, Mode=TwoWay}" />
+							<CheckBox Content="Fatal" Margin="10,5" IsChecked="{Binding ShowFatal, Mode=TwoWay}" />
+						</StackPanel>
+					</Grid>
+
+					<DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}" Grid.Row="1"
+							  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10" CanUserAddRows="False" 
+							  CanUserSortColumns="False" GridLinesVisibility="Horizontal">
+					</DataGrid>
+
+				</Grid>
+			</Controls:MetroTabItem>
+
+		</Controls:MetroAnimatedSingleRowTabControl>
+
+		<Grid Grid.Row="1" Background="{DynamicResource AccentColorBrush}">
+			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=NotConnected}">
+				<TextBlock Text="Not Connected" />
+				<Ellipse Width="10" Height="10" Margin="5,0" Fill="White" />
+			</StackPanel>
+			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=Connected}">
+				<TextBlock Text="Connected" />
+				<Ellipse Width="10" Height="10" Margin="5,0" Fill="DarkGreen" />
+			</StackPanel>
+			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=Connecting}">
+				<TextBlock Text="Connecting ..." />
+				<Ellipse Width="10" Height="10" Margin="5,0" Fill="Gray" />
+			</StackPanel>
+			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=FailedToConnect}">
+				<TextBlock Text="Failed to connect" />
+				<Ellipse Width="10" Height="10" Margin="5,0" Fill="DarkRed" />
+			</StackPanel>
+		</Grid>
+
+		<local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="Collapsed"></local:SettingsControl>
+	</Grid>
 </Controls:MetroWindow>
