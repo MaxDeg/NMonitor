@@ -23,121 +23,123 @@ using System.Reactive.Linq;
 
 namespace NMonitor.WPF.ViewModels
 {
-	public class LogCollectionViewModel : ReactiveObject, IDisposable
-	{
-		private const int MaxItemInList = 100;
-		private ReactiveList<LogEntry> logs;
-		private IDisposable logsSource;
-		private IDisposable logsSubscribtion;
+    public class LogCollectionViewModel : ReactiveObject, IDisposable
+    {
+        private const int MaxItemInList = 100;
+        private ReactiveList<LogEntry> logs;
+        private IDisposable logsSource;
+        private IDisposable logsSubscribtion;
 
-		private CollectionStatus status;
+        private CollectionStatus status;
+        private ReactiveList<Tuple<string, ReactiveList<double>>> simple;
 
-		private bool showInfo = true;
-		private bool showWarn = true;
-		private bool showError = true;
-		private bool showFatal = true;
-		private string logger = string.Empty;
+        public ReactiveList<Tuple<string, ReactiveList<double>>> SimpleChart
+        {
+            get { return this.simple; }
+            set { this.RaiseAndSetIfChanged(ref this.simple, value); }
+        }
 
-		public LogCollectionViewModel()
-		{
-			this.Parameters = new RabbitMQConfigurationViewModel();
-			this.Status = CollectionStatus.NotConnected;
-			this.Loggers = new ReactiveList<LogCollectionFilterViewModel<string>>();
-			this.LogLevels = new List<LogCollectionFilterViewModel<LogLevel>>()
-			{
-				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Info, "Info", false),
-				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Warn, "Warn", true),
-				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Error, "Error", true),
-				new LogCollectionFilterViewModel<LogLevel>(LogLevel.Fatal, "Fatal", true),
-			};
+        public LogCollectionViewModel()
+        {
+            this.Parameters = new RabbitMQConfigurationViewModel();
+            this.Status = CollectionStatus.NotConnected;
+            this.Loggers = new ReactiveList<LogCollectionFilterViewModel<string>>();
+            this.LogLevels = new List<LogCollectionFilterViewModel<LogLevel>>()
+            {
+                new LogCollectionFilterViewModel<LogLevel>(LogLevel.Info, "Info", false),
+                new LogCollectionFilterViewModel<LogLevel>(LogLevel.Warn, "Warn", true),
+                new LogCollectionFilterViewModel<LogLevel>(LogLevel.Error, "Error", true),
+                new LogCollectionFilterViewModel<LogLevel>(LogLevel.Fatal, "Fatal", true),
+            };
+            this.logs = new ReactiveList<LogEntry>()
+            {
+                ChangeTrackingEnabled = true
+            };
+            this.Logs = this.logs.CreateDerivedCollection(l => l, e => this.Loggers.Any(l => string.CompareOrdinal(l.Value, e.Logger) == 0)
+                                                                            && this.LogLevels.Any(l => l.Value == e.Level));
+            this.Charts = new ChartsViewModel();
+            this.Charts.AddChart(l => l.Level.ToString(), (a, l) => a + 1.0, l => true);
+            this.SimpleChart = this.Charts.Charts.First();
 
-			this.logs = new ReactiveList<LogEntry>()
-			{
-				ChangeTrackingEnabled = true
-			};
-			this.logs.CountChanged.Subscribe(i =>
-			{
-				if (i > MaxItemInList)
-					this.logs.RemoveRange(MaxItemInList - 1, i - MaxItemInList);
-			});
-			this.logs.ItemsAdded.Subscribe(l =>
-			{
-				if (!this.Loggers.Any(il => il.Value == l.Logger))
-					this.Loggers.Add(new LogCollectionFilterViewModel<string>(l.Logger, l.Logger, true));
-			});
-			this.Logs = this.logs.CreateDerivedCollection(l => l, e => this.Loggers.Any(l => string.CompareOrdinal(l.Value, e.Logger) == 0)
-																			&& this.LogLevels.Any(l => l.Value == e.Level));
-			
-			this.WhenAnyValue(
-				t => t.Parameters.Host,
-				t => t.Parameters.UserName,
-				t => t.Parameters.Password,
-				t => t.Parameters.Exchange,
-				t => t.Parameters.ExchangeType,
-				t => t.Parameters.RoutingKey,
-				(h, u, p, e, et, r) => new RabbitMqParameters
-				{
-					Host = h,
-					UserName = u,
-					Password = p,
-					Exchange = e,
-					ExchangeType = et,
-					RoutingKey = r
-				})
-				.Throttle(TimeSpan.FromSeconds(5))
-				.ObserveOnDispatcher()
-				.Subscribe(this.ConnectToLogCollection);
-			
-			//this.WhenAnyValue(
-			//	t => t.ShowInfo,
-			//	t => t.ShowWarn,
-			//	t => t.ShowError,
-			//	t => t.ShowFatal,
-			//	t => t.Logger)
-			//	.ObserveOnDispatcher()
-			//	.Subscribe(x => this.Logs.Reset());
-		}
+            this.logs.CountChanged.Where(i => i > MaxItemInList)
+                .Subscribe(i => this.logs.RemoveRange(MaxItemInList - 1, i - MaxItemInList));
 
-		public IReactiveDerivedList<LogEntry> Logs { get; private set; }
-		
-		public RabbitMQConfigurationViewModel Parameters { get; set; }
+            this.logs.ItemsAdded.Where(l => !this.Loggers.Any(il => il.Value == l.Logger)).Subscribe(l =>
+                this.Loggers.Add(new LogCollectionFilterViewModel<string>(l.Logger, l.Logger, true)));
 
-		public CollectionStatus Status
-		{
-			get { return this.status; }
-			set { this.RaiseAndSetIfChanged(ref this.status, value); }
-		}
+            this.WhenAnyValue(
+                t => t.Parameters.Host,
+                t => t.Parameters.UserName,
+                t => t.Parameters.Password,
+                t => t.Parameters.Exchange,
+                t => t.Parameters.ExchangeType,
+                t => t.Parameters.RoutingKey,
+                (h, u, p, e, et, r) => new RabbitMqParameters
+                {
+                    Host = h,
+                    UserName = u,
+                    Password = p,
+                    Exchange = e,
+                    ExchangeType = et,
+                    RoutingKey = r
+                })
+                .Throttle(TimeSpan.FromSeconds(5))
+                .ObserveOnDispatcher()
+                .Subscribe(this.ConnectToLogCollection);
 
-		public ReactiveList<LogCollectionFilterViewModel<string>> Loggers { get; private set; }
+            //this.WhenAnyValue(
+            //	t => t.ShowInfo,
+            //	t => t.ShowWarn,
+            //	t => t.ShowError,
+            //	t => t.ShowFatal,
+            //	t => t.Logger)
+            //	.ObserveOnDispatcher()
+            //	.Subscribe(x => this.Logs.Reset());
+        }
 
-		public List<LogCollectionFilterViewModel<LogLevel>> LogLevels { get; private set; }
+        public IReactiveDerivedList<LogEntry> Logs { get; private set; }
 
-		public void Dispose()
-		{
-			this.logsSource?.Dispose();
-		}
+        public RabbitMQConfigurationViewModel Parameters { get; set; }
 
-		private void ConnectToLogCollection(RabbitMqParameters parameters)
-		{
-			try
-			{
-				this.Status = CollectionStatus.Connecting;
+        public CollectionStatus Status
+        {
+            get { return this.status; }
+            set { this.RaiseAndSetIfChanged(ref this.status, value); }
+        }
 
-				// Dispose existing
-				this.logsSource?.Dispose();
-				this.logsSubscribtion?.Dispose();
+        public ChartsViewModel Charts { get; private set; }
 
-				var logs = new RabbitMqLogCollection(parameters);
-				this.logsSource = logs;
-				this.logsSubscribtion = logs.ObserveOnDispatcher()
-											.Subscribe(l => this.logs.Insert(0, l));
+        public ReactiveList<LogCollectionFilterViewModel<string>> Loggers { get; private set; }
 
-				this.Status = CollectionStatus.Connected;
-			}
-			catch (Exception e)
-			{
-				this.Status = CollectionStatus.FailedToConnect;
-			}
-		}
-	}
+        public List<LogCollectionFilterViewModel<LogLevel>> LogLevels { get; private set; }
+
+        public void Dispose()
+        {
+            this.logsSource?.Dispose();
+        }
+
+        private void ConnectToLogCollection(RabbitMqParameters parameters)
+        {
+            try
+            {
+                this.Status = CollectionStatus.Connecting;
+
+                // Dispose existing
+                this.logsSource?.Dispose();
+                this.logsSubscribtion?.Dispose();
+                this.Charts?.Dispose();
+
+                var logs = new RabbitMqLogCollection(parameters);
+                this.logsSource = logs;
+                this.logsSubscribtion = logs.ObserveOnDispatcher().Subscribe(l => this.logs.Insert(0, l));
+                this.Charts.SetSource(logs);
+
+                this.Status = CollectionStatus.Connected;
+            }
+            catch (Exception e)
+            {
+                this.Status = CollectionStatus.FailedToConnect;
+            }
+        }
+    }
 }

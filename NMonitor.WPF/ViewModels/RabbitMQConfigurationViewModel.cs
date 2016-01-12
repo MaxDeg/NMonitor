@@ -36,12 +36,16 @@ namespace NMonitor.WPF.ViewModels
 
 		public RabbitMQConfigurationViewModel()
 		{
-			this.host = "sony-dev";
-			this.userName = "sony.app";
-			this.password = "711F1'7R48~4BxM";
-			this.exchange = "sony.logs";
-			this.exchangeType = "topic";
-			this.routingKey = "*";
+            //this.host = "sony-dev";
+            //this.userName = "sony.app";
+            //this.password = "711F1'7R48~4BxM";
+            //this.exchange = "sony.logs";
+            this.host = "localhost";
+            this.userName = "guest";
+            this.password = "guest";
+            this.exchange = "logs";
+            this.exchangeType = "topic";
+			this.routingKey = "#";
 		}
 
 		public string Host

@@ -42,10 +42,10 @@ namespace NMonitor.WPF
 
         public MainWindow()
         {
-            InitializeComponent();
-
 			this.ViewModel = new LogCollectionViewModel();
 			this.DataContext = this.ViewModel;
+
+            InitializeComponent();
         }
 
 		private void Button_Click(object sender, RoutedEventArgs e)

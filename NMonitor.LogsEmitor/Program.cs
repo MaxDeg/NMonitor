@@ -51,7 +51,7 @@ namespace NMonitor.LogsEmitor
                         break;
                 }
 
-                Thread.Sleep(300);
+                Thread.Sleep(1000);
             }
         }
     }

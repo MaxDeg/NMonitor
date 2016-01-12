@@ -23,7 +23,8 @@
 		<ResourceDictionary>
 			<helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
 			<helpers:EnumToBoolConverter x:Key="EnumToBool"/>
-			<helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
+            <helpers:ToSeriesConverter x:Key="ToSeries"/>
+            <helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
 
 			<CollectionViewSource x:Key="Logs" Source="{Binding Logs}">
 				<CollectionViewSource.SortDescriptions>
@@ -58,28 +59,10 @@
 			<Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20">
 
 				<WrapPanel>
-					<liveCharts:LineChart AreaOpacity=".1" LineType="Polyline" Width="350" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
-						<liveCharts:LineChart.Series>
-							<liveCharts:LineSeries Title="Maria" 
-                                  PrimaryValues="20, 40, 45, 60, 55, 60, 65, 70" 
-                                  PointRadius="0" 
-                                    Stroke="#FFB300"      
-                                    Fill="#19FFB300"   
-                                  StrokeThickness="1"></liveCharts:LineSeries>
-							<liveCharts:LineSeries Title="John" 
-                                  PrimaryValues="30, 35, 43, 68, 65 ,70, 55, 60"
-                                  PointRadius="0"
-                                    Stroke="#FFA000"  
-                                    Fill="#2AFFA000" 
-                                  StrokeThickness="1"></liveCharts:LineSeries>
-							<liveCharts:LineSeries Title="Erick" 
-                                  PrimaryValues="40, 42, 50, 70, 50, 55, 44, 73" 
-                                  PointRadius="0" 
-                                    Stroke="#FF8F00"  
-                                    Fill="#2AFF8F00" 
-                                  StrokeThickness="1"></liveCharts:LineSeries>
-						</liveCharts:LineChart.Series>
-						<liveCharts:LineChart.PrimaryAxis>
+                    <liveCharts:LineChart Series="{Binding SimpleChart, Converter={StaticResource ToSeries}}"
+                                          AreaOpacity=".1" LineType="Polyline" Width="350" Height="150"
+                                          HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <liveCharts:LineChart.PrimaryAxis>
 							<liveCharts:Axis Foreground="White" FontSize="10">
 								<liveCharts:Axis.Separator>
 									<liveCharts:Separator Color="#404040" Thickness="1" Enabled="True"></liveCharts:Separator>
@@ -87,7 +70,7 @@
 							</liveCharts:Axis>
 						</liveCharts:LineChart.PrimaryAxis>
 						<liveCharts:LineChart.SecondaryAxis>
-							<liveCharts:Axis FontSize="10" Labels="Jan, Feb, Mar, Apr, May, Jun, Ago, Sep, Oct, Nov, Dec">
+                            <liveCharts:Axis FontSize="10" Labels="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20">
 								<liveCharts:Axis.Separator>
 									<liveCharts:Separator Enabled="False"></liveCharts:Separator>
 								</liveCharts:Axis.Separator>
@@ -96,19 +79,11 @@
 					</liveCharts:LineChart>
 					<liveCharts:LineChart AreaOpacity=".1" LineType="Polyline" Width="350" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
 						<liveCharts:LineChart.Series>
-							<liveCharts:LineSeries Title="Maria" 
+                            <liveCharts:LineSeries Title="Maria" 
                           PrimaryValues="20, 40, 45, 60, 55, 60, 65, 70" 
                           PointRadius="0" 
                           StrokeThickness="1"></liveCharts:LineSeries>
-							<liveCharts:LineSeries Title="John" 
-                          PrimaryValues="30, 35, 43, 68, 65 ,70, 55, 60"
-                          PointRadius="0"
-                          StrokeThickness="1"></liveCharts:LineSeries>
-							<liveCharts:LineSeries Title="Erick" 
-                          PrimaryValues="40, 42, 50, 70, 50, 55, 44, 73" 
-                          PointRadius="0" 
-                          StrokeThickness="1"></liveCharts:LineSeries>
-						</liveCharts:LineChart.Series>
+                        </liveCharts:LineChart.Series>
 						<liveCharts:LineChart.PrimaryAxis>
 							<liveCharts:Axis Foreground="White" FontSize="10">
 								<liveCharts:Axis.Separator>
