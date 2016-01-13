@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Collections.ObjectModel;
 
 namespace NMonitor.WPF.Helpers
 {
@@ -30,11 +31,12 @@ namespace NMonitor.WPF.Helpers
         {
             var data = value as ReactiveList<Tuple<string, ReactiveList<double>>>;
 
-            return data.CreateDerivedCollection(d => new LineSeries
-            {
-                Title = d.Item1,
-                PrimaryValues = d.Item2
-            });
+			return new ReactiveObservableCollectionWrapper<Series>(data.CreateDerivedCollection(d => new LineSeries
+			{
+				Name = d.Item1,
+				Title = d.Item1,
+				PrimaryValues = d.Item2
+			}));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -9,89 +9,104 @@ using System.Threading.Tasks;
 
 namespace NMonitor.WPF.ViewModels
 {
-    public class ChartsViewModel : ReactiveObject, IDisposable
-    {
-        private static readonly TimeSpan TimelineInterval = TimeSpan.FromSeconds(5);
-        private static readonly int TimelineSize = (int)(TimeSpan.FromMinutes(10).Ticks / TimelineInterval.Ticks);
+	public class ChartsViewModel : ReactiveObject, IDisposable
+	{
+		private static readonly TimeSpan TimelineInterval = TimeSpan.FromSeconds(3);
+		private static readonly int TimelineSize = (int)(TimeSpan.FromMinutes(2).Ticks / TimelineInterval.Ticks);
 
-        private readonly ReactiveList<string> timeline;
-        private readonly List<IDisposable> subscriptions;
-        private readonly List<Action<IList<LogEntry>>> chartDefinitions;
-        private IObservable<IList<LogEntry>> bufferedSource;
+		private readonly List<IDisposable> subscriptions;
+		private readonly List<Action<IList<LogEntry>>> chartDefinitions;
+		private ReactiveList<string> timeline;
+		private IObservable<IList<LogEntry>> bufferedSource;
 
-        public ChartsViewModel()
-        {
-            this.subscriptions = new List<IDisposable>();
-            this.chartDefinitions = new List<Action<IList<LogEntry>>>();
-            this.timeline = this.CreateLimitedSizeList<string>(TimelineSize);
-            timeline.AddRange(Enumerable.Range(0, TimelineSize).Select(i => i.ToString()));
+		public ChartsViewModel()
+		{
+			this.subscriptions = new List<IDisposable>();
+			this.chartDefinitions = new List<Action<IList<LogEntry>>>();
+			var timeline = this.CreateLimitedSizeList<string>(TimelineSize);
+			timeline.AddRange(Enumerable.Range(0, TimelineSize).Select(i => i.ToString()));
+			this.Timeline = timeline;
 
-            this.Charts = new ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>>();
-        }
+			this.Charts = new ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>>();
+		}
 
-        public ReactiveList<string> Timeline
-        {
-            get { return this.timeline; }
-        }
+		public ReactiveList<string> Timeline
+		{
+			get { return this.timeline; }
+			set { this.RaiseAndSetIfChanged(ref this.timeline, value); }
+		}
 
-        public ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>> Charts { get; private set; }
+		public ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>> Charts { get; private set; }
 
-        public void SetSource(IObservable<LogEntry> source)
-        {
-            this.DisposeSubscriptions();
+		public void SetSource(IObservable<LogEntry> source)
+		{
+			this.DisposeSubscriptions();
 
-            this.bufferedSource = source.Buffer(TimelineInterval).ObserveOnDispatcher();
-            this.bufferedSource.Subscribe(d => this.timeline.Add(DateTime.Now.Ticks.ToString("hh:mm:ss")));
+			this.bufferedSource = source.Buffer(TimelineInterval).ObserveOnDispatcher();
+			this.bufferedSource.Subscribe(d => this.timeline.Add(DateTime.Now.Ticks.ToString("hh:mm:ss")));
 
-            foreach (var definition in this.chartDefinitions)
-                this.subscriptions.Add(this.bufferedSource.Subscribe(definition));
-        }
+			foreach (var definition in this.chartDefinitions)
+				this.subscriptions.Add(this.bufferedSource.Subscribe(definition));
+		}
 
-        public void AddChart(Func<LogEntry, string> keySelector, Func<double, LogEntry, double> aggregator, Func<LogEntry, bool> filter)
-        {
-            var series = new ReactiveList<Tuple<string, ReactiveList<double>>>();
-            Action<IList<LogEntry>> chartDefinition = logs =>
-            {
-                var lookup = logs.Where(filter).ToLookup(keySelector);
-                foreach (var entries in lookup)
-                {
-                    var list = series.FirstOrDefault(s => string.CompareOrdinal(s.Item1, entries.Key) == 0);
-                    if (list == null)
-                    {
-                        list = Tuple.Create(entries.Key, this.CreateLimitedSizeList<double>(TimelineSize));
-                        series.Add(list);
-                    }
+		public ReactiveList<Tuple<string, ReactiveList<double>>> AddChart(Func<LogEntry, string> keySelector, Func<double, LogEntry, double> aggregator, Func<LogEntry, bool> filter)
+		{
+			var series = new ReactiveList<Tuple<string, ReactiveList<double>>>();
+			Action<IList<LogEntry>> chartDefinition = logs =>
+			{
+				var lookup = logs.Where(filter).ToLookup(keySelector).ToDictionary(t => t.Key, t => t.AsEnumerable());
+				foreach (var serie in series)
+				{
+					IEnumerable<LogEntry> list;
+					if (lookup.TryGetValue(serie.Item1, out list))
+						lookup.Remove(serie.Item1);
+					else
+						list = Enumerable.Empty<LogEntry>();
 
-                    list.Item2.Add(entries.Aggregate(0.0, aggregator));
-                }
-            };
-            this.chartDefinitions.Add(chartDefinition);
+					serie.Item2.Add(list.Aggregate(0.0, aggregator));
+				}
 
-            if (this.bufferedSource != null)
-                this.subscriptions.Add(this.bufferedSource.Subscribe(chartDefinition));
+				foreach (var key in lookup.Keys)
+				{
+					var list = Tuple.Create(key, this.CreateLimitedSizeList<double>(TimelineSize));
 
-            this.Charts.Add(series);
-        }
+					var firstSeries = series.FirstOrDefault();
+					if (firstSeries != null)
+						list.Item2.AddRange(Enumerable.Range(0, firstSeries.Item2.Count - 1).Select(i => 0.0));
+					
+					list.Item2.Add(lookup[key].Aggregate(0.0, aggregator));
+					
+					series.Add(list);
+				}
+			};
+			this.chartDefinitions.Add(chartDefinition);
 
-        public void Dispose()
-        {
-            this.DisposeSubscriptions();
-        }
+			if (this.bufferedSource != null)
+				this.subscriptions.Add(this.bufferedSource.Subscribe(chartDefinition));
 
-        private ReactiveList<TValue> CreateLimitedSizeList<TValue>(int size)
-        {
-            var list = new ReactiveList<TValue>();
-            list.CountChanged.Where(i => i > size).Subscribe(i => list.RemoveRange(size - 1, i - size));
+			this.Charts.Add(series);
+			return series;
+		}
 
-            return list;
-        }
-        
-        private void DisposeSubscriptions()
-        {
-            foreach (var subscription in this.subscriptions)
-                subscription.Dispose();
+		public void Dispose()
+		{
+			this.DisposeSubscriptions();
+		}
 
-            this.subscriptions.Clear();
-        }
-    }
+		private ReactiveList<TValue> CreateLimitedSizeList<TValue>(int size)
+		{
+			var list = new ReactiveList<TValue>();
+			list.CountChanged.Where(i => i > size).Subscribe(i => list.RemoveRange(size - 1, i - size));
+
+			return list;
+		}
+
+		private void DisposeSubscriptions()
+		{
+			foreach (var subscription in this.subscriptions)
+				subscription.Dispose();
+
+			this.subscriptions.Clear();
+		}
+	}
 }

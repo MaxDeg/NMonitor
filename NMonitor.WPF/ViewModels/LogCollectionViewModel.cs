@@ -26,11 +26,12 @@ namespace NMonitor.WPF.ViewModels
     public class LogCollectionViewModel : ReactiveObject, IDisposable
     {
         private const int MaxItemInList = 100;
+
         private ReactiveList<LogEntry> logs;
         private IDisposable logsSource;
         private IDisposable logsSubscribtion;
-
-        private CollectionStatus status;
+		private ChartsViewModel charts;
+		private CollectionStatus status;
         private ReactiveList<Tuple<string, ReactiveList<double>>> simple;
 
         public ReactiveList<Tuple<string, ReactiveList<double>>> SimpleChart
@@ -107,9 +108,13 @@ namespace NMonitor.WPF.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.status, value); }
         }
 
-        public ChartsViewModel Charts { get; private set; }
+        public ChartsViewModel Charts
+		{
+			get { return this.charts; }
+			set { this.RaiseAndSetIfChanged(ref this.charts, value); }
+		}
 
-        public ReactiveList<LogCollectionFilterViewModel<string>> Loggers { get; private set; }
+		public ReactiveList<LogCollectionFilterViewModel<string>> Loggers { get; private set; }
 
         public List<LogCollectionFilterViewModel<LogLevel>> LogLevels { get; private set; }
 
