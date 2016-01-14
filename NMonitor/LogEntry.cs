@@ -23,11 +23,13 @@ using System.Threading.Tasks;
 
 namespace NMonitor
 {
-    public class LogEntry
-    {
-        public LogLevel Level { get; set; }
-        public string Time { get; set; }
-        public string Logger { get; set; }
-        public string Message { get; set; }
-    }
+	public class LogEntry
+	{
+		public LogLevel Level { get; set; }
+		public string Time { get; set; }
+		public string Machine { get; set; }
+		public string Application { get; set; }
+		public string Logger { get; set; }
+		public string Message { get; set; }
+	}
 }

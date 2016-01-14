@@ -11,8 +11,8 @@ namespace NMonitor.WPF.ViewModels
 {
 	public class ChartsViewModel : ReactiveObject, IDisposable
 	{
-		private static readonly TimeSpan TimelineInterval = TimeSpan.FromSeconds(3);
-		private static readonly int TimelineSize = (int)(TimeSpan.FromMinutes(2).Ticks / TimelineInterval.Ticks);
+		private static readonly TimeSpan TimelineInterval = TimeSpan.FromSeconds(2);
+		private static readonly int TimelineSize = (int)(TimeSpan.FromMinutes(1).Ticks / TimelineInterval.Ticks);
 
 		private readonly List<IDisposable> subscriptions;
 		private readonly List<Action<IList<LogEntry>>> chartDefinitions;
@@ -23,10 +23,7 @@ namespace NMonitor.WPF.ViewModels
 		{
 			this.subscriptions = new List<IDisposable>();
 			this.chartDefinitions = new List<Action<IList<LogEntry>>>();
-			var timeline = this.CreateLimitedSizeList<string>(TimelineSize);
-			timeline.AddRange(Enumerable.Range(0, TimelineSize).Select(i => i.ToString()));
-			this.Timeline = timeline;
-
+			this.Timeline = this.CreateLimitedSizeList<string>(TimelineSize);
 			this.Charts = new ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>>();
 		}
 
@@ -43,7 +40,7 @@ namespace NMonitor.WPF.ViewModels
 			this.DisposeSubscriptions();
 
 			this.bufferedSource = source.Buffer(TimelineInterval).ObserveOnDispatcher();
-			this.bufferedSource.Subscribe(d => this.timeline.Add(DateTime.Now.Ticks.ToString("hh:mm:ss")));
+			this.bufferedSource.Subscribe(d => this.timeline.Add(DateTime.Now.ToString("hh:mm:ss")));
 
 			foreach (var definition in this.chartDefinitions)
 				this.subscriptions.Add(this.bufferedSource.Subscribe(definition));
@@ -96,7 +93,7 @@ namespace NMonitor.WPF.ViewModels
 		private ReactiveList<TValue> CreateLimitedSizeList<TValue>(int size)
 		{
 			var list = new ReactiveList<TValue>();
-			list.CountChanged.Where(i => i > size).Subscribe(i => list.RemoveRange(size - 1, i - size));
+			list.CountChanged.Where(i => i > size).Subscribe(i => list.RemoveRange(0, i - size));
 
 			return list;
 		}

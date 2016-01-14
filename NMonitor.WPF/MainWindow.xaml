@@ -12,7 +12,7 @@
 					  xmlns:helpers="clr-namespace:NMonitor.WPF.Helpers"
                       mc:Ignorable="d"
 					  Icon="charts.ico"
-                      Title="NMonitor" Height="400" Width="750"                      
+                      Title="NMonitor" Height="500" Width="900"                      
                       BorderBrush="{DynamicResource AccentColorBrush}"
                       BorderThickness="1" 
                       ResizeMode="CanResizeWithGrip"
@@ -24,13 +24,8 @@
 			<helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
 			<helpers:EnumToBoolConverter x:Key="EnumToBool"/>
             <helpers:ToSeriesConverter x:Key="ToSeries"/>
+			<helpers:ToLabelsConverter x:Key="ToLabels"/>
 			<helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
-
-			<CollectionViewSource x:Key="Logs" Source="{Binding Logs}">
-				<CollectionViewSource.SortDescriptions>
-					<scm:SortDescription Direction="Descending" />
-				</CollectionViewSource.SortDescriptions>
-			</CollectionViewSource>
 		</ResourceDictionary>
 	</Controls:MetroWindow.Resources>
 
@@ -54,9 +49,9 @@
 			<RowDefinition Height="Auto"></RowDefinition>
 		</Grid.RowDefinitions>
 
-		<Controls:MetroAnimatedSingleRowTabControl TabStripPlacement="Left" TabStripMargin="10,0" Margin="10">
+		<Controls:MetroAnimatedSingleRowTabControl TabStripPlacement="Top" TabStripMargin="10,0,10,20" Margin="10">
 
-			<Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20">
+			<Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20" Padding="10,0">
 
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -68,31 +63,60 @@
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
 
-					<liveCharts:LineChart Series="{Binding SimpleChart, Converter={StaticResource ToSeries}}"
-                                          AreaOpacity=".1" LineType="Polyline" 
-										  Height="250" Margin="5" VerticalAlignment="Top">
-						<liveCharts:LineChart.PrimaryAxis>
-							<liveCharts:Axis Foreground="Transparent" FontSize="10" IsEnabled="False">
-								<liveCharts:Axis.Separator>
-									<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
-								</liveCharts:Axis.Separator>
-							</liveCharts:Axis>
-						</liveCharts:LineChart.PrimaryAxis>
-						<liveCharts:LineChart.SecondaryAxis>
-							<liveCharts:Axis FontSize="10" Labels="{Binding Charts.Timeline}" IsEnabled="False">
-								<liveCharts:Axis.Separator>
-									<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
-								</liveCharts:Axis.Separator>
-							</liveCharts:Axis>
-						</liveCharts:LineChart.SecondaryAxis>
-					</liveCharts:LineChart>
+					<StackPanel>
+						<TextBlock Text="Logs Per Level" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
+
+						<liveCharts:LineChart Name="LogsPerLevel" Series="{Binding LevelsChart, Converter={StaticResource ToSeries}}" 
+											  LineType="Polyline" Hoverable="False" Height="250" Margin="5">
+							<liveCharts:LineChart.PrimaryAxis>
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1"
+												 Labels="{Binding LevelsChart, Converter={StaticResource ToLabels}}">
+									<liveCharts:Axis.Separator>
+										<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
+									</liveCharts:Axis.Separator>
+								</liveCharts:Axis>
+							</liveCharts:LineChart.PrimaryAxis>
+							<liveCharts:LineChart.SecondaryAxis>
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
+									<liveCharts:Axis.Separator>
+										<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
+									</liveCharts:Axis.Separator>
+								</liveCharts:Axis>
+							</liveCharts:LineChart.SecondaryAxis>
+						</liveCharts:LineChart>
+						<liveCharts:SeriesViewer Orientation="Horizontal" Series="{Binding ElementName=LogsPerLevel, Path=Series}" Margin="10,5" HorizontalAlignment="Center"/>
+					</StackPanel>
+
+					<StackPanel  Grid.Column="2">
+						<TextBlock Text="Logs Per Application" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
+
+						<liveCharts:LineChart Name="LogsPerApplication" Series="{Binding ApplicationsChart, Converter={StaticResource ToSeries}}"
+											  LineType="Polyline" Hoverable="False" Height="250" Margin="5">
+							<liveCharts:LineChart.PrimaryAxis>
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1"
+												 Labels="{Binding ApplicationsChart, Converter={StaticResource ToLabels}}">
+									<liveCharts:Axis.Separator>
+										<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
+									</liveCharts:Axis.Separator>
+								</liveCharts:Axis>
+							</liveCharts:LineChart.PrimaryAxis>
+							<liveCharts:LineChart.SecondaryAxis>
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
+									<liveCharts:Axis.Separator>
+										<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
+									</liveCharts:Axis.Separator>
+								</liveCharts:Axis>
+							</liveCharts:LineChart.SecondaryAxis>
+						</liveCharts:LineChart>
+						<liveCharts:SeriesViewer Orientation="Horizontal" Series="{Binding ElementName=LogsPerApplication, Path=Series}" Margin="10,5" HorizontalAlignment="Center"/>
+					</StackPanel>
 
 					<WrapPanel Grid.Row="1" Grid.ColumnSpan="2"></WrapPanel>
 				</Grid>
 
 			</Controls:MetroTabItem>
 
-			<Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" BorderBrush="{x:Null}" IsSelected="True">
+			<Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" IsSelected="True" Padding="10,0">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>

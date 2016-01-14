@@ -40,7 +40,10 @@ namespace NMonitor.WPF.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.simple, value); }
         }
 
-        public LogCollectionViewModel()
+		public ReactiveList<Tuple<string, ReactiveList<double>>> LevelsChart { get; private set; }
+		public ReactiveList<Tuple<string, ReactiveList<double>>> ApplicationsChart { get; private set; }
+
+		public LogCollectionViewModel()
         {
             this.Parameters = new RabbitMQConfigurationViewModel();
             this.Status = CollectionStatus.NotConnected;
@@ -59,10 +62,10 @@ namespace NMonitor.WPF.ViewModels
             this.Logs = this.logs.CreateDerivedCollection(l => l, e => this.Loggers.Any(l => string.CompareOrdinal(l.Value, e.Logger) == 0)
                                                                             && this.LogLevels.Any(l => l.Value == e.Level));
             this.Charts = new ChartsViewModel();
-            this.Charts.AddChart(l => l.Level.ToString(), (a, l) => a + 1.0, l => true);
-            this.SimpleChart = this.Charts.Charts.First();
+			this.LevelsChart = this.Charts.AddChart(l => l.Level.ToString(), (a, l) => a + 1.0, l => l.Level > LogLevel.Info);
+			this.ApplicationsChart = this.Charts.AddChart(l => l.Application, (a, l) => a + 1.0, l => l.Level > LogLevel.Info);
 
-            this.logs.CountChanged.Where(i => i > MaxItemInList)
+			this.logs.CountChanged.Where(i => i > MaxItemInList)
                 .Subscribe(i => this.logs.RemoveRange(MaxItemInList - 1, i - MaxItemInList));
 
             this.logs.ItemsAdded.Where(l => !this.Loggers.Any(il => il.Value == l.Logger)).Subscribe(l =>

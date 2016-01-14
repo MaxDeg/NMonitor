@@ -29,9 +29,12 @@ namespace NMonitor.LogsEmitor
 
             while (true)
             {
-                switch (randomer.Next() % 4)
+                switch (randomer.Next() % 6)
                 {
                     case 0:
+					case 5:
+						break;
+
                     case 1:
                         logger.Info("FYI it happends");
                         break;
@@ -51,7 +54,7 @@ namespace NMonitor.LogsEmitor
                         break;
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
     }

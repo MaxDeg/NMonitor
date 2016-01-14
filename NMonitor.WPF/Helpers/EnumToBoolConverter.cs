@@ -24,24 +24,4 @@ namespace NMonitor.WPF.Helpers
             return Enum.Parse(value.GetType(), (string)parameter);
         }
     }
-
-    public class ToSeriesConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var data = value as ReactiveList<Tuple<string, ReactiveList<double>>>;
-
-			return new ReactiveObservableCollectionWrapper<Series>(data.CreateDerivedCollection(d => new LineSeries
-			{
-				Name = d.Item1,
-				Title = d.Item1,
-				PrimaryValues = d.Item2
-			}));
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }
