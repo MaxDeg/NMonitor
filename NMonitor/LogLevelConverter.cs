@@ -15,19 +15,26 @@
 ******************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+using Newtonsoft.Json;
+using NLog;
 
-namespace NMonitor.WPF
+namespace NMonitor
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    internal class LogLevelConverter : JsonConverter
     {
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(string) == objectType;
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return LogLevel.FromString((string)reader.Value);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

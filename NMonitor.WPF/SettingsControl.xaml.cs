@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,19 +31,14 @@ using System.Windows.Shapes;
 
 namespace NMonitor.WPF
 {
-	/// <summary>
-	/// Interaction logic for SettingsControl.xaml
-	/// </summary>
-	public partial class SettingsControl : UserControl
-	{
-		public SettingsControl()
-		{
-			InitializeComponent();
-		}
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			this.Visibility = Visibility.Collapsed;
-		}
-	}
+    /// <summary>
+    /// Interaction logic for SettingsControl.xaml
+    /// </summary>
+    public partial class SettingsControl : UserControl
+    {
+        public SettingsControl()
+        {
+            this.InitializeComponent();
+        }
+    }
 }

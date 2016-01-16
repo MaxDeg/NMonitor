@@ -3,210 +3,240 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:Behaviours="clr-namespace:MahApps.Metro.Behaviours;assembly=MahApps.Metro"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:liveCharts="clr-namespace:LiveCharts;assembly=LiveCharts"
                       xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase" 
                       xmlns:local="clr-namespace:NMonitor.WPF"
 					  xmlns:helpers="clr-namespace:NMonitor.WPF.Helpers"
+                      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+                      xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
+                      xmlns:tk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                      xmlns:tkdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                       mc:Ignorable="d"
+                      x:Name="root"
 					  Icon="charts.ico"
                       Title="NMonitor" Height="500" Width="900"                      
                       BorderBrush="{DynamicResource AccentColorBrush}"
                       BorderThickness="1" 
                       ResizeMode="CanResizeWithGrip"
 					  ShowTitleBar="True"
-                      WindowStartupLocation="CenterScreen">
+                      WindowStartupLocation="CenterScreen" Closing="OnClosing">
 
-	<Controls:MetroWindow.Resources>
-		<ResourceDictionary>			
-			<helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
-			<helpers:EnumToBoolConverter x:Key="EnumToBool"/>
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+            <helpers:EnumToBoolConverter x:Key="EnumToBool"/>
             <helpers:ToSeriesConverter x:Key="ToSeries"/>
-			<helpers:ToLabelsConverter x:Key="ToLabels"/>
-			<helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
-		</ResourceDictionary>
-	</Controls:MetroWindow.Resources>
+            <helpers:ToLogLevelSeriesConverter x:Key="ToLogLevelSeries"/>
+            <helpers:NegateBoolConverter x:Key="NegateBool"/>
+            <helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
 
-	<Controls:MetroWindow.RightWindowCommands>
-		<Controls:WindowCommands>
-			<Button Click="Button_Click">
-				<Rectangle Width="16" Height="16" 
+            <ControlTemplate x:Key="SimpleTemplate">
+                <StackPanel>
+                    <TextBlock Text="Loggers" />
+                </StackPanel>
+            </ControlTemplate>
+            <ControlTemplate x:Key="ExtendedTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+                    <TextBlock Text="{Binding Label}" />
+                </StackPanel>
+            </ControlTemplate>
+            <DataTemplate x:Key="CustomerTemplate">
+                <Control x:Name="theControl" Focusable="False" Template="{StaticResource ExtendedTemplate}" />
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ComboBoxItem}}, Path=IsSelected}" Value="{x:Null}">
+                        <Setter TargetName="theControl" Property="Template" Value="{StaticResource SimpleTemplate}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Controls:MetroWindow.Resources>
+
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Button>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:ChangePropertyAction TargetObject="{Binding Parameters}" PropertyName="IsEditing" Value="{Binding Parameters.IsEditing, Converter={StaticResource NegateBool}}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Rectangle Width="16" Height="16" 
 						   Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
-					<Rectangle.OpacityMask>
-						<VisualBrush Stretch="Fill" Visual="{StaticResource appbar_settings}" />
-					</Rectangle.OpacityMask>
-				</Rectangle>
-			</Button>
-		</Controls:WindowCommands>
-	</Controls:MetroWindow.RightWindowCommands>
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_settings}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </Button>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
 
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="*"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-		</Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
 
-		<Controls:MetroAnimatedSingleRowTabControl TabStripPlacement="Top" TabStripMargin="10,0,10,20" Margin="10">
+        <Controls:MetroAnimatedSingleRowTabControl TabStripPlacement="Top" TabStripMargin="10,0,10,20" Margin="10">
 
-			<Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20" Padding="10,0">
+            <Controls:MetroTabItem Header="Graphs" Controls:ControlsHelper.HeaderFontSize="20" Padding="10,0">
 
-				<Grid>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*"/>
-						<ColumnDefinition Width="*"/>
-					</Grid.ColumnDefinitions>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="*"/>
-					</Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-					<StackPanel>
-						<TextBlock Text="Logs Per Level" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
+                    <StackPanel>
+                        <TextBlock Text="Logs Per Level" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
 
-						<liveCharts:LineChart Name="LogsPerLevel" Series="{Binding LevelsChart, Converter={StaticResource ToSeries}}" 
+                        <liveCharts:LineChart Name="LogsPerLevel" Series="{Binding LevelsChart, Converter={StaticResource ToLogLevelSeries}}" 
 											  LineType="Polyline" Hoverable="False" Height="250" Margin="5">
-							<liveCharts:LineChart.PrimaryAxis>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1"
-												 Labels="{Binding LevelsChart, Converter={StaticResource ToLabels}}">
-									<liveCharts:Axis.Separator>
-										<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
-									</liveCharts:Axis.Separator>
-								</liveCharts:Axis>
-							</liveCharts:LineChart.PrimaryAxis>
-							<liveCharts:LineChart.SecondaryAxis>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
-									<liveCharts:Axis.Separator>
-										<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
-									</liveCharts:Axis.Separator>
-								</liveCharts:Axis>
-							</liveCharts:LineChart.SecondaryAxis>
-						</liveCharts:LineChart>
-						<liveCharts:SeriesViewer Orientation="Horizontal" Series="{Binding ElementName=LogsPerLevel, Path=Series}" Margin="10,5" HorizontalAlignment="Center"/>
-					</StackPanel>
+                            <liveCharts:LineChart.PrimaryAxis>
+                                <liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1">
+                                    <liveCharts:Axis.Separator>
+                                        <liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
+                                    </liveCharts:Axis.Separator>
+                                </liveCharts:Axis>
+                            </liveCharts:LineChart.PrimaryAxis>
+                            <liveCharts:LineChart.SecondaryAxis>
+                                <liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
+                                    <liveCharts:Axis.Separator>
+                                        <liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
+                                    </liveCharts:Axis.Separator>
+                                </liveCharts:Axis>
+                            </liveCharts:LineChart.SecondaryAxis>
+                        </liveCharts:LineChart>
+                        <liveCharts:SeriesViewer Orientation="Horizontal" Series="{Binding ElementName=LogsPerLevel, Path=Series}" Margin="10,5" HorizontalAlignment="Center"/>
+                    </StackPanel>
 
-					<StackPanel  Grid.Column="2">
-						<TextBlock Text="Logs Per Application" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
+                    <StackPanel  Grid.Column="2">
+                        <TextBlock Text="Logs Per Application" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
 
-						<liveCharts:LineChart Name="LogsPerApplication" Series="{Binding ApplicationsChart, Converter={StaticResource ToSeries}}"
+                        <liveCharts:LineChart Name="LogsPerApplication" Series="{Binding ApplicationsChart, Converter={StaticResource ToSeries}}"
 											  LineType="Polyline" Hoverable="False" Height="250" Margin="5">
-							<liveCharts:LineChart.PrimaryAxis>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1"
-												 Labels="{Binding ApplicationsChart, Converter={StaticResource ToLabels}}">
-									<liveCharts:Axis.Separator>
-										<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
-									</liveCharts:Axis.Separator>
-								</liveCharts:Axis>
-							</liveCharts:LineChart.PrimaryAxis>
-							<liveCharts:LineChart.SecondaryAxis>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
-									<liveCharts:Axis.Separator>
-										<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
-									</liveCharts:Axis.Separator>
-								</liveCharts:Axis>
-							</liveCharts:LineChart.SecondaryAxis>
-						</liveCharts:LineChart>
-						<liveCharts:SeriesViewer Orientation="Horizontal" Series="{Binding ElementName=LogsPerApplication, Path=Series}" Margin="10,5" HorizontalAlignment="Center"/>
-					</StackPanel>
+                            <liveCharts:LineChart.PrimaryAxis>
+                                <liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1">
+                                    <liveCharts:Axis.Separator>
+                                        <liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
+                                    </liveCharts:Axis.Separator>
+                                </liveCharts:Axis>
+                            </liveCharts:LineChart.PrimaryAxis>
+                            <liveCharts:LineChart.SecondaryAxis>
+                                <liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
+                                    <liveCharts:Axis.Separator>
+                                        <liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
+                                    </liveCharts:Axis.Separator>
+                                </liveCharts:Axis>
+                            </liveCharts:LineChart.SecondaryAxis>
+                        </liveCharts:LineChart>
+                        <liveCharts:SeriesViewer Orientation="Horizontal" Series="{Binding ElementName=LogsPerApplication, Path=Series}" Margin="10,5" HorizontalAlignment="Center"/>
+                    </StackPanel>
 
-					<WrapPanel Grid.Row="1" Grid.ColumnSpan="2"></WrapPanel>
-				</Grid>
+                    <WrapPanel Grid.Row="1" Grid.ColumnSpan="2"></WrapPanel>
+                </Grid>
 
-			</Controls:MetroTabItem>
+            </Controls:MetroTabItem>
 
-			<Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" IsSelected="True" Padding="10,0">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="*"/>
-					</Grid.RowDefinitions>
+            <Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" IsSelected="True" Padding="10,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="100"/>
-							<ColumnDefinition Width="*"/>
-						</Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-						<Controls:DropDownButton ItemsSource="{Binding Loggers}" VerticalContentAlignment="Center">
-							<Controls:DropDownButton.ItemTemplate>
-								<DataTemplate>
-									<StackPanel Orientation="Horizontal">
-										<CheckBox IsChecked="{Binding IsSelected}" Width="20" />
-										<TextBlock Text="{Binding Label}" />
-									</StackPanel>
-								</DataTemplate>
-							</Controls:DropDownButton.ItemTemplate>
-						</Controls:DropDownButton>
+                        <ComboBox ItemsSource="{Binding Loggers}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+                                        <TextBlock Text="{Binding Label}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
-						<!--<ComboBox ItemsSource="{Binding Loggers}">
-							<ComboBox.ItemTemplate>
-								<DataTemplate>
-									<StackPanel Orientation="Horizontal">
-										<CheckBox IsChecked="{Binding IsSelected}" Width="20" />
-										<TextBlock Text="{Binding Label}" />
-									</StackPanel>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>-->
+                        <ComboBox ItemsSource="{Binding LogLevels}" Grid.Column="2">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+                                        <TextBlock Text="{Binding Label}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
 
-						<!--<StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
-							<CheckBox Content="Info" Margin="10,5" IsChecked="{Binding ShowInfo, Mode=TwoWay}" />
-							<CheckBox Content="Warn" Margin="10,5" IsChecked="{Binding ShowWarn, Mode=TwoWay}" />
-							<CheckBox Content="Error" Margin="10,5" IsChecked="{Binding ShowError, Mode=TwoWay}" />
-							<CheckBox Content="Fatal" Margin="10,5" IsChecked="{Binding ShowFatal, Mode=TwoWay}" />
-						</StackPanel>-->
-					</Grid>
-
-					<DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}" Grid.Row="1"
+                    <DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}" Grid.Row="1" AutoGenerateColumns="False"
 							  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10" CanUserAddRows="False" 
-							  CanUserSortColumns="False" GridLinesVisibility="None" CanUserReorderColumns="False" CanUserResizeColumns="False">
-						<DataGrid.RowStyle>
-							<Style TargetType="DataGridRow">
-								<Style.Triggers>
-									<DataTrigger Binding="{Binding Level}" Value="Warn">
-										<Setter Property="Foreground" Value="Black"></Setter>
-										<Setter Property="Background" Value="#FFFFB266"></Setter>
-									</DataTrigger>
-									<DataTrigger Binding="{Binding Level}" Value="Error">
-										<Setter Property="Foreground" Value="Black"></Setter>
-										<Setter Property="Background" Value="#FFFF8080"></Setter>
-									</DataTrigger>
-									<DataTrigger Binding="{Binding Level}" Value="Fatal">
-										<Setter Property="Foreground" Value="Black"></Setter>
-										<Setter Property="Background" Value="#FFB30000"></Setter>
-									</DataTrigger>
-								</Style.Triggers>
-							</Style>
-						</DataGrid.RowStyle>
-					</DataGrid>
+							  CanUserSortColumns="False" GridLinesVisibility="None" CanUserReorderColumns="False" CanUserResizeColumns="False"
+                              IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Level.Name}" Value="Info">
+                                        <Setter Property="Foreground" Value="#FF297FB8"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Level.Name}" Value="Warn">
+                                        <Setter Property="Foreground" Value="#FFF0C33C"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Level.Name}" Value="Error">
+                                        <Setter Property="Foreground" Value="#FFE64C3C"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Level.Name}" Value="Fatal">
+                                        <Setter Property="Foreground" Value="#FFB30000"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level.Name}"/>
+                            <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
+                            <DataGridTextColumn Header="Machine" Binding="{Binding Machine}"/>
+                            <DataGridTextColumn Header="Application" Binding="{Binding Application}"/>
+                            <DataGridTextColumn Header="Logger" Binding="{Binding Logger}"/>
+                            <DataGridTextColumn Header="Message" Binding="{Binding Message}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
 
-				</Grid>
-			</Controls:MetroTabItem>
+                </Grid>
+            </Controls:MetroTabItem>
 
-		</Controls:MetroAnimatedSingleRowTabControl>
+        </Controls:MetroAnimatedSingleRowTabControl>
 
-		<Grid Grid.Row="1" Background="{DynamicResource AccentColorBrush}">
-			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=NotConnected}">
-				<TextBlock Text="Not Connected" />
-				<Ellipse Width="10" Height="10" Margin="5,0" Fill="White" />
-			</StackPanel>
-			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=Connected}">
-				<TextBlock Text="Connected" />
-				<Ellipse Width="10" Height="10" Margin="5,0" Fill="DarkGreen" />
-			</StackPanel>
-			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=Connecting}">
-				<TextBlock Text="Connecting ..." />
-				<Ellipse Width="10" Height="10" Margin="5,0" Fill="Gray" />
-			</StackPanel>
-			<StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=FailedToConnect}">
-				<TextBlock Text="Failed to connect" />
-				<Ellipse Width="10" Height="10" Margin="5,0" Fill="DarkRed" />
-			</StackPanel>
-		</Grid>
+        <Grid Grid.Row="1" Background="{DynamicResource AccentColorBrush}">
+            <StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=NotConnected}">
+                <TextBlock Text="Not Connected" />
+                <Ellipse Width="10" Height="10" Margin="5,0" Fill="White" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=Connected}">
+                <TextBlock Text="Connected" />
+                <Ellipse Width="10" Height="10" Margin="5,0" Fill="DarkGreen" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=Connecting}">
+                <TextBlock Text="Connecting ..." />
+                <Ellipse Width="10" Height="10" Margin="5,0" Fill="Gray" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=FailedToConnect}">
+                <TextBlock Text="Failed to connect" />
+                <Ellipse Width="10" Height="10" Margin="5,0" Fill="DarkRed" />
+            </StackPanel>
+        </Grid>
 
-		<local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="Collapsed"></local:SettingsControl>
-	</Grid>
+        <local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}"></local:SettingsControl>
+    </Grid>
 </Controls:MetroWindow>

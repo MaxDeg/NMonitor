@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,28 +18,28 @@ using ReactiveUI;
 
 namespace NMonitor.WPF.ViewModels
 {
-	public class LogCollectionFilterViewModel<TValue> : ReactiveObject
-	{
-		private bool isSelected;
+    public class LogCollectionFilterViewModel<TValue> : ReactiveObject
+    {
+        private bool isSelected;
 
-		public LogCollectionFilterViewModel(TValue value, string label)
-			: this(value, label, false) { }
+        public LogCollectionFilterViewModel(TValue value, string label)
+            : this(value, label, false) { }
 
-		public LogCollectionFilterViewModel(TValue value, string label, bool isSelected)
-		{
-			this.Value = value;
-			this.Label = label;
-			this.isSelected = isSelected;
-		}
+        public LogCollectionFilterViewModel(TValue value, string label, bool isSelected)
+        {
+            this.Value = value;
+            this.Label = label;
+            this.IsSelected = isSelected;
+        }
 
-		public TValue Value { get; private set; }
+        public TValue Value { get; private set; }
 
-		public string Label { get; private set; }
+        public string Label { get; private set; }
 
-		public bool IsSelected
-		{
-			get { return this.isSelected; }
-			set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
-		}
-	}
+        public bool IsSelected
+        {
+            get { return this.isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
+    }
 }

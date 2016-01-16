@@ -22,5 +22,77 @@ namespace NMonitor.WPF.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string RabbitMQHost {
+            get {
+                return ((string)(this["RabbitMQHost"]));
+            }
+            set {
+                this["RabbitMQHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RabbitMQUser {
+            get {
+                return ((string)(this["RabbitMQUser"]));
+            }
+            set {
+                this["RabbitMQUser"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RabbitMQPassword {
+            get {
+                return ((string)(this["RabbitMQPassword"]));
+            }
+            set {
+                this["RabbitMQPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RabbitMQExchange {
+            get {
+                return ((string)(this["RabbitMQExchange"]));
+            }
+            set {
+                this["RabbitMQExchange"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("topic")]
+        public string RabbitMQExchangeType {
+            get {
+                return ((string)(this["RabbitMQExchangeType"]));
+            }
+            set {
+                this["RabbitMQExchangeType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#")]
+        public string RabbitMQRoutingKey {
+            get {
+                return ((string)(this["RabbitMQRoutingKey"]));
+            }
+            set {
+                this["RabbitMQRoutingKey"] = value;
+            }
+        }
     }
 }

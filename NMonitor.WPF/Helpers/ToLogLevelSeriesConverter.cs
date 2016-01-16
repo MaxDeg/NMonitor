@@ -19,10 +19,11 @@ using ReactiveUI;
 using System;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace NMonitor.WPF.Helpers
 {
-    public class ToSeriesConverter : IValueConverter
+    public class ToLogLevelSeriesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -33,13 +34,36 @@ namespace NMonitor.WPF.Helpers
                 Title = d.Item1,
                 PrimaryValues = d.Item2,
                 PointRadius = 0.0,
-                StrokeThickness = 1.0
+                Stroke = this.GetBrushByLevel(d.Item1, 255),
+                StrokeThickness = 1.0,
+                Fill = this.GetBrushByLevel(d.Item1, 59)
             }));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+
+        private SolidColorBrush GetBrushByLevel(string level, byte opacity)
+        {
+            switch (level)
+            {
+                case "Info":
+                    return new SolidColorBrush(Color.FromArgb(opacity, 41, 127, 184));
+
+                case "Warn":
+                    return new SolidColorBrush(Color.FromArgb(opacity, 240, 195, 15));
+
+                case "Error":
+                    return new SolidColorBrush(Color.FromArgb(opacity, 230, 76, 60));
+
+                case "Fatal":
+                    return new SolidColorBrush(Color.FromArgb(opacity, 179, 0, 0));
+
+                default:
+                    return null;
+            }
         }
     }
 }

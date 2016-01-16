@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ namespace NMonitor.LogsEmitor
                 switch (randomer.Next() % 6)
                 {
                     case 0:
-					case 5:
-						break;
+                    case 5:
+                        break;
 
                     case 1:
                         logger.Info("FYI it happends");

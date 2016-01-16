@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,27 +18,29 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive.Subjects;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace NMonitor
 {
-    public sealed class RabbitMqLogCollection : IObservable<LogEntry>, IDisposable
+    public sealed class RabbitMqLogCollection : ILogSource<RabbitMqParameters>
     {
         private IConnection connection;
         private IModel channel;
         private EventingBasicConsumer consumer;
-
         private Subject<LogEntry> asyncSubject;
 
-        public RabbitMqLogCollection(RabbitMqParameters parameters)
+        public RabbitMqLogCollection()
         {
             this.asyncSubject = new Subject<LogEntry>();
+        }
+
+        public void Connect(RabbitMqParameters parameters)
+        {
+            this.channel?.Dispose();
+            this.connection?.Dispose();
 
             var factory = new ConnectionFactory()
             {
@@ -48,7 +50,7 @@ namespace NMonitor
             };
 
             this.connection = factory.CreateConnection();
-            this.channel = connection.CreateModel();
+            this.channel = this.connection.CreateModel();
 
             this.channel.ExchangeDeclare(exchange: parameters.Exchange, type: parameters.ExchangeType, durable: true);
 

@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
     limitations under the License.
 ******************************************************************************/
 
-using Splat;
+using Newtonsoft.Json;
+using NLog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NMonitor
 {
-	public class LogEntry
-	{
-		public LogLevel Level { get; set; }
-		public string Time { get; set; }
-		public string Machine { get; set; }
-		public string Application { get; set; }
-		public string Logger { get; set; }
-		public string Message { get; set; }
-	}
+    public class LogEntry
+    {
+        [JsonConverter(typeof(LogLevelConverter))]
+        public LogLevel Level { get; set; }
+        public string Time { get; set; }
+        public string Machine { get; set; }
+        public string Application { get; set; }
+        public Guid ActivityId { get; set; }
+        public string Logger { get; set; }
+        public string Message { get; set; }
+    }
 }

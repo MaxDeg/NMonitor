@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
     limitations under the License.
 ******************************************************************************/
 
-using ReactiveUI;
-
 namespace NMonitor
 {
-	public sealed class RabbitMqParameters
-	{
-		public string Host { get; set; }
-		public string UserName { get; set; }
-		public string Password { get; set; }
+    public sealed class RabbitMqParameters
+    {
+        public string Host { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
 
-		public string Exchange { get; set; }
-		public string ExchangeType { get; set; }
-		public string RoutingKey { get; set; }
-	}
+        public string Exchange { get; set; }
+        public string ExchangeType { get; set; }
+        public string RoutingKey { get; set; }
+    }
 }

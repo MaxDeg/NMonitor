@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
-    Copyright 2015 Maxime Degallaix
+    Copyright 2016 Maxime Degallaix
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ using MahApps.Metro.Controls;
 using NMonitor.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,19 +39,19 @@ namespace NMonitor.WPF
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-		public LogCollectionViewModel ViewModel { get; set; }
-
         public MainWindow()
         {
-			this.ViewModel = new LogCollectionViewModel();
-			this.DataContext = this.ViewModel;
+            this.ViewModel = new LogCollectionViewModel();
+            this.DataContext = this.ViewModel;
 
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			this.settingsPane.Visibility = this.settingsPane.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-		}
-	}
+        public LogCollectionViewModel ViewModel { get; set; }
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            this.ViewModel.Dispose();
+        }
+    }
 }
