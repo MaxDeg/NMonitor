@@ -14,7 +14,7 @@
                       xmlns:tk="http://schemas.xceed.com/wpf/xaml/toolkit"
                       xmlns:tkdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                       mc:Ignorable="d"
-                      x:Name="root"
+                      Name="root"
 					  Icon="charts.ico"
                       Title="NMonitor" Height="500" Width="900"                      
                       BorderBrush="{DynamicResource AccentColorBrush}"
@@ -32,24 +32,12 @@
             <helpers:NegateBoolConverter x:Key="NegateBool"/>
             <helpers:CombiningConverter Converter1="{StaticResource EnumToBool}" Converter2="{StaticResource BoolToVisibility}" x:Key="EnumToVisibility"/>
 
-            <ControlTemplate x:Key="SimpleTemplate">
-                <StackPanel>
-                    <TextBlock Text="Loggers" />
-                </StackPanel>
-            </ControlTemplate>
-            <ControlTemplate x:Key="ExtendedTemplate">
+
+            <DataTemplate x:Key="FilterTemplate">
                 <StackPanel Orientation="Horizontal">
                     <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
                     <TextBlock Text="{Binding Label}" />
                 </StackPanel>
-            </ControlTemplate>
-            <DataTemplate x:Key="CustomerTemplate">
-                <Control x:Name="theControl" Focusable="False" Template="{StaticResource ExtendedTemplate}" />
-                <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ComboBoxItem}}, Path=IsSelected}" Value="{x:Null}">
-                        <Setter TargetName="theControl" Property="Template" Value="{StaticResource SimpleTemplate}" />
-                    </DataTrigger>
-                </DataTemplate.Triggers>
             </DataTemplate>
         </ResourceDictionary>
     </Controls:MetroWindow.Resources>
@@ -145,75 +133,118 @@
             </Controls:MetroTabItem>
 
             <Controls:MetroTabItem Header="Logs" Controls:ControlsHelper.HeaderFontSize="20" IsSelected="True" Padding="10,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <ComboBox ItemsSource="{Binding Loggers}">
-                            <ComboBox.ItemTemplate>
+                <DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}" AutoGenerateColumns="False"
+							  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="-10,5,-10,-10" Padding="5" CanUserAddRows="False" 
+							  CanUserSortColumns="False" GridLinesVisibility="Horizontal" IsReadOnly="True" SelectionMode="Single">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Level.Name}" Value="Info">
+                                    <Setter Property="Foreground" Value="#FF297FB8"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Level.Name}" Value="Warn">
+                                    <Setter Property="Foreground" Value="#FFF0C33C"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Level.Name}" Value="Error">
+                                    <Setter Property="Foreground" Value="#FFE64C3C"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Level.Name}" Value="Fatal">
+                                    <Setter Property="Foreground" Value="#FFB30000"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Level" Binding="{Binding Level.Name}">
+                            <DataGridTextColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
-                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                        <Menu BorderThickness="0" Margin="6,0,0,0">
+                                            <MenuItem ItemsSource="{Binding DataContext.LogLevels, ElementName=root}"
+                                                      ItemTemplate="{StaticResource FilterTemplate}">
+                                                <MenuItem.Header>
+                                                    <Rectangle Width="10" Height="10" Fill="{DynamicResource AccentColorBrush}" Margin="0,1,0,0">
+                                                        <Rectangle.OpacityMask>
+                                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_filter}" />
+                                                        </Rectangle.OpacityMask>
+                                                    </Rectangle>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                        </Menu>
                                     </StackPanel>
                                 </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-
-                        <ComboBox ItemsSource="{Binding LogLevels}" Grid.Column="2">
-                            <ComboBox.ItemTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
+                        <DataGridTextColumn Header="Machine" Binding="{Binding Machine}">
+                            <DataGridTextColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
-                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                        <Menu BorderThickness="0" Margin="6,0,0,0">
+                                            <MenuItem ItemsSource="{Binding DataContext.LogMachines, ElementName=root}"
+                                                      ItemTemplate="{StaticResource FilterTemplate}">
+                                                <MenuItem.Header>
+                                                    <Rectangle Width="10" Height="10" Fill="{DynamicResource AccentColorBrush}" Margin="0,1,0,0">
+                                                        <Rectangle.OpacityMask>
+                                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_filter}" />
+                                                        </Rectangle.OpacityMask>
+                                                    </Rectangle>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                        </Menu>
                                     </StackPanel>
                                 </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </Grid>
+                            </DataGridTextColumn.HeaderTemplate>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Application" Binding="{Binding Application}">
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                        <Menu BorderThickness="0" Margin="6,0,0,0">
+                                            <MenuItem ItemsSource="{Binding DataContext.LogApplications, ElementName=root}"
+                                                      ItemTemplate="{StaticResource FilterTemplate}">
+                                                <MenuItem.Header>
+                                                    <Rectangle Width="10" Height="10" Fill="{DynamicResource AccentColorBrush}" Margin="0,1,0,0">
+                                                        <Rectangle.OpacityMask>
+                                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_filter}" />
+                                                        </Rectangle.OpacityMask>
+                                                    </Rectangle>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                        </Menu>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Logger" Binding="{Binding Logger}">
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                        <Menu BorderThickness="0" Margin="6,0,0,0">
+                                            <MenuItem ItemsSource="{Binding DataContext.Loggers, ElementName=root}" 
+                                                      ItemTemplate="{StaticResource FilterTemplate}">
+                                                <MenuItem.Header>
+                                                    <Rectangle Width="10" Height="10" Fill="{DynamicResource AccentColorBrush}" Margin="0,1,0,0">
+                                                        <Rectangle.OpacityMask>
+                                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_filter}" />
+                                                        </Rectangle.OpacityMask>
+                                                    </Rectangle>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                        </Menu>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Message" Binding="{Binding Message}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                    <DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}" Grid.Row="1" AutoGenerateColumns="False"
-							  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10" CanUserAddRows="False" 
-							  CanUserSortColumns="False" GridLinesVisibility="None" CanUserReorderColumns="False" CanUserResizeColumns="False"
-                              IsReadOnly="True" SelectionMode="Single">
-                        <DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Level.Name}" Value="Info">
-                                        <Setter Property="Foreground" Value="#FF297FB8"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Level.Name}" Value="Warn">
-                                        <Setter Property="Foreground" Value="#FFF0C33C"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Level.Name}" Value="Error">
-                                        <Setter Property="Foreground" Value="#FFE64C3C"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Level.Name}" Value="Fatal">
-                                        <Setter Property="Foreground" Value="#FFB30000"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Level" Binding="{Binding Level.Name}"/>
-                            <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
-                            <DataGridTextColumn Header="Machine" Binding="{Binding Machine}"/>
-                            <DataGridTextColumn Header="Application" Binding="{Binding Application}"/>
-                            <DataGridTextColumn Header="Logger" Binding="{Binding Logger}"/>
-                            <DataGridTextColumn Header="Message" Binding="{Binding Message}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-
-                </Grid>
             </Controls:MetroTabItem>
 
         </Controls:MetroAnimatedSingleRowTabControl>
@@ -237,6 +268,6 @@
             </StackPanel>
         </Grid>
 
-        <local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}"></local:SettingsControl>
+        <!--<local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}"></local:SettingsControl>-->
     </Grid>
 </Controls:MetroWindow>

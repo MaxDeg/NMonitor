@@ -40,7 +40,6 @@ namespace NMonitor
         public void Connect(RabbitMqParameters parameters)
         {
             this.channel?.Dispose();
-            this.connection?.Dispose();
 
             var factory = new ConnectionFactory()
             {

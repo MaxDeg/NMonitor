@@ -42,6 +42,11 @@ namespace NMonitor.WPF.ViewModels
             this.LogMachines = new ReactiveList<LogCollectionFilterViewModel<string>>() { ChangeTrackingEnabled = true };
             this.LogApplications = new ReactiveList<LogCollectionFilterViewModel<string>>() { ChangeTrackingEnabled = true };
 
+            this.LogLevels.Add(new LogCollectionFilterViewModel<LogLevel>(LogLevel.Info, "Info"));
+            this.LogLevels.Add(new LogCollectionFilterViewModel<LogLevel>(LogLevel.Warn, "Warn", true));
+            this.LogLevels.Add(new LogCollectionFilterViewModel<LogLevel>(LogLevel.Error, "Error", true));
+            this.LogLevels.Add(new LogCollectionFilterViewModel<LogLevel>(LogLevel.Fatal, "Fatal", true));
+
             this.logsSource = new RabbitMqLogCollection();
             this.logsSource
                 .ObserveOnDispatcher()
@@ -63,13 +68,16 @@ namespace NMonitor.WPF.ViewModels
             this.Parameters = new RabbitMQConfigurationViewModel();
             this.ConnectToLogCollection();
 
-            this.ObservableForProperty(t => t.Parameters.IsEditing)
-                .ObserveOnDispatcher()
+            this.Parameters.Changed
+                .Buffer(() => this.ObservableForProperty(t => t.Parameters.IsEditing).Where(p => !p.Value))
+                .Where(ps => ps.Any(p => p.PropertyName != nameof(this.Parameters.IsEditing)))
                 .Subscribe(_ => this.ConnectToLogCollection());
 
             Observable.Merge(
                 this.Loggers.ItemChanged.Select(_ => Unit.Default),
-                this.LogLevels.ItemChanged.Select(_ => Unit.Default))
+                this.LogLevels.ItemChanged.Select(_ => Unit.Default),
+                this.LogApplications.ItemChanged.Select(_ => Unit.Default),
+                this.LogMachines.ItemChanged.Select(_ => Unit.Default))
                 .ObserveOnDispatcher()
                 .Subscribe(_ => this.Logs.Reset());
         }
@@ -159,9 +167,6 @@ namespace NMonitor.WPF.ViewModels
 
         private void AddToLogs(LogEntry entry)
         {
-            if (!this.LogLevels.Any(il => il.Value == entry.Level))
-                this.LogLevels.Add(new LogCollectionFilterViewModel<LogLevel>(entry.Level, entry.Level.Name, true));
-
             if (!this.Loggers.Any(il => il.Value == entry.Logger))
                 this.Loggers.Add(new LogCollectionFilterViewModel<string>(entry.Logger, entry.Logger, true));
 
