@@ -136,9 +136,10 @@
 							  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="-10,5,-10,-10" Padding="5" CanUserAddRows="False" 
 							  CanUserSortColumns="False" CanUserReorderColumns="False" GridLinesVisibility="Horizontal" IsReadOnly="True" SelectionMode="Single">
                     <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Level.Name}" Value="Info">
+						<Style TargetType="DataGridRow">
+							<Setter Property="IsHitTestVisible" Value="False"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Level.Name}" Value="Info">
 									<Setter Property="Foreground" Value="#FF119EDA"></Setter>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Level.Name}" Value="Warn">
@@ -147,10 +148,14 @@
                                 <DataTrigger Binding="{Binding Level.Name}" Value="Error">
                                     <Setter Property="Foreground" Value="#FFE64C3C"></Setter>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Level.Name}" Value="Fatal">
-                                    <Setter Property="Foreground" Value="#FFB30000"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
+								<DataTrigger Binding="{Binding Level.Name}" Value="Fatal">
+									<Setter Property="Foreground" Value="#FFB30000"></Setter>
+								</DataTrigger>
+
+								<Trigger Property="IsMouseOver" Value="True">
+									<Setter Property="Background" Value="#22FFFFFF" />
+								</Trigger>
+							</Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
