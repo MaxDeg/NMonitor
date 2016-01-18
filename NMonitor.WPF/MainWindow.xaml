@@ -11,8 +11,6 @@
 					  xmlns:helpers="clr-namespace:NMonitor.WPF.Helpers"
                       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                       xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
-                      xmlns:tk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                      xmlns:tkdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                       mc:Ignorable="d"
                       Name="root"
 					  Icon="charts.ico"
@@ -136,12 +134,12 @@
 
                 <DataGrid Background="{x:Null}" BorderBrush="{x:Null}" ItemsSource="{Binding Logs}" AutoGenerateColumns="False"
 							  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="-10,5,-10,-10" Padding="5" CanUserAddRows="False" 
-							  CanUserSortColumns="False" GridLinesVisibility="Horizontal" IsReadOnly="True" SelectionMode="Single">
+							  CanUserSortColumns="False" CanUserReorderColumns="False" GridLinesVisibility="Horizontal" IsReadOnly="True" SelectionMode="Single">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Level.Name}" Value="Info">
-                                    <Setter Property="Foreground" Value="#FF297FB8"></Setter>
+									<Setter Property="Foreground" Value="#FF119EDA"></Setter>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Level.Name}" Value="Warn">
                                     <Setter Property="Foreground" Value="#FFF0C33C"></Setter>
@@ -249,7 +247,7 @@
 
         </Controls:MetroAnimatedSingleRowTabControl>
 
-        <Grid Grid.Row="1" Background="{DynamicResource AccentColorBrush}">
+        <Grid Grid.Row="1">
             <StackPanel Orientation="Horizontal" Margin="10,5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding Status, Converter={StaticResource EnumToVisibility}, ConverterParameter=NotConnected}">
                 <TextBlock Text="Not Connected" />
                 <Ellipse Width="10" Height="10" Margin="5,0" Fill="White" />
@@ -268,6 +266,6 @@
             </StackPanel>
         </Grid>
 
-        <!--<local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}"></local:SettingsControl>-->
+        <local:SettingsControl x:Name="settingsPane" Grid.RowSpan="3" DataContext="{Binding Parameters}" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}"></local:SettingsControl>
     </Grid>
 </Controls:MetroWindow>
