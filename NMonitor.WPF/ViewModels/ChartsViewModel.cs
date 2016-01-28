@@ -40,7 +40,7 @@ namespace NMonitor.WPF.ViewModels
             this.subscriptions = new List<IDisposable>();
             this.chartDefinitions = new List<Action<IList<LogEntry>>>();
             this.Timeline = this.CreateLimitedSizeList<string>(TimelineSize);
-            this.Charts = new ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>>();
+            this.Charts = new ReactiveList<ReactiveList<Tuple<string, ReactiveList<int>>>>();
         }
 
         public ReactiveList<string> Timeline
@@ -49,7 +49,7 @@ namespace NMonitor.WPF.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.timeline, value); }
         }
 
-        public ReactiveList<ReactiveList<Tuple<string, ReactiveList<double>>>> Charts { get; private set; }
+        public ReactiveList<ReactiveList<Tuple<string, ReactiveList<int>>>> Charts { get; private set; }
 
         public void SetSource(IObservable<LogEntry> source)
         {
@@ -62,9 +62,9 @@ namespace NMonitor.WPF.ViewModels
                 this.subscriptions.Add(this.bufferedSource.Subscribe(definition));
         }
 
-        public ReactiveList<Tuple<string, ReactiveList<double>>> AddChart(Func<LogEntry, string> keySelector, Func<double, LogEntry, double> aggregator, Func<LogEntry, bool> filter)
+        public ReactiveList<Tuple<string, ReactiveList<int>>> AddChart(Func<LogEntry, string> keySelector, Func<int, LogEntry, int> aggregator, Func<LogEntry, bool> filter)
         {
-            var series = new ReactiveList<Tuple<string, ReactiveList<double>>>();
+            var series = new ReactiveList<Tuple<string, ReactiveList<int>>>();
             Action<IList<LogEntry>> chartDefinition = logs =>
             {
                 var lookup = logs.Where(filter).ToLookup(keySelector).ToDictionary(t => t.Key, t => t.AsEnumerable());
@@ -76,18 +76,18 @@ namespace NMonitor.WPF.ViewModels
                     else
                         list = Enumerable.Empty<LogEntry>();
 
-                    serie.Item2.Add(list.Aggregate(0.0, aggregator));
+                    serie.Item2.Add(list.Aggregate(0, aggregator));
                 }
 
                 foreach (var key in lookup.Keys)
                 {
-                    var list = Tuple.Create(key, this.CreateLimitedSizeList<double>(TimelineSize));
+                    var list = Tuple.Create(key, this.CreateLimitedSizeList<int>(TimelineSize));
 
                     var firstSeries = series.FirstOrDefault();
                     if (firstSeries != null)
-                        list.Item2.AddRange(Enumerable.Range(0, firstSeries.Item2.Count - 1).Select(i => 0.0));
+                        list.Item2.AddRange(Enumerable.Range(0, firstSeries.Item2.Count - 1).Select(i => 0));
 
-                    list.Item2.Add(lookup[key].Aggregate(0.0, aggregator));
+                    list.Item2.Add(lookup[key].Aggregate(0, aggregator));
 
                     series.Add(list);
                 }

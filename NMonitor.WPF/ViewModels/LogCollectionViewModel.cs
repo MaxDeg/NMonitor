@@ -27,7 +27,7 @@ namespace NMonitor.WPF.ViewModels
 {
     public class LogCollectionViewModel : ReactiveObject, IDisposable
     {
-        private const int MaxItemInList = 100;
+        private const int MaxItemInList = 10000;
 
         private ILogSource<RabbitMqParameters> logsSource;
         private ReactiveList<LogEntry> logs;
@@ -62,8 +62,8 @@ namespace NMonitor.WPF.ViewModels
             this.Charts = new ChartsViewModel();
             this.Charts.SetSource(this.logsSource);
 
-            this.LevelsChart = this.Charts.AddChart(l => l.Level.ToString(), (a, l) => a + 1.0, l => l.Level > LogLevel.Info);
-            this.ApplicationsChart = this.Charts.AddChart(l => l.Application, (a, l) => a + 1.0, l => l.Level > LogLevel.Info);
+            this.LevelsChart = this.Charts.AddChart(l => l.Level.ToString(), (a, l) => a + 1, l => l.Level > LogLevel.Info);
+            this.ApplicationsChart = this.Charts.AddChart(l => l.Application, (a, l) => a + 1, l => l.Level > LogLevel.Info);
 
             this.Parameters = new RabbitMQConfigurationViewModel();
             this.ConnectToLogCollection();
@@ -98,9 +98,9 @@ namespace NMonitor.WPF.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.status, value); }
         }
 
-        public ReactiveList<Tuple<string, ReactiveList<double>>> LevelsChart { get; private set; }
+        public ReactiveList<Tuple<string, ReactiveList<int>>> LevelsChart { get; private set; }
 
-        public ReactiveList<Tuple<string, ReactiveList<double>>> ApplicationsChart { get; private set; }
+        public ReactiveList<Tuple<string, ReactiveList<int>>> ApplicationsChart { get; private set; }
 
         public ReactiveList<LogCollectionFilterViewModel<string>> Loggers { get; private set; }
 

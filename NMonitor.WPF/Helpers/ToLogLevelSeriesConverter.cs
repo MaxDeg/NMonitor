@@ -15,6 +15,7 @@
 ******************************************************************************/
 
 using LiveCharts;
+using LiveCharts.CoreComponents;
 using ReactiveUI;
 using System;
 using System.Globalization;
@@ -27,12 +28,12 @@ namespace NMonitor.WPF.Helpers
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var data = value as ReactiveList<Tuple<string, ReactiveList<double>>>;
+            var data = value as ReactiveList<Tuple<string, ReactiveList<int>>>;
 
-            return new ReactiveObservableCollectionWrapper<Series>(data.CreateDerivedCollection(d => new LineSeries
+			return new ReactiveObservableCollectionWrapper<Series>(data.CreateDerivedCollection(d => new LineSeries
             {
                 Title = d.Item1,
-                PrimaryValues = d.Item2,
+                Values = d.Item2.AsChartValues<int>(),
                 PointRadius = 0.0,
                 Stroke = this.GetBrushByLevel(d.Item1, 255),
                 StrokeThickness = 1.0,
