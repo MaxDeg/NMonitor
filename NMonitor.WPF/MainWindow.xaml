@@ -83,16 +83,16 @@
                         <TextBlock Text="Logs Per Level" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
 
 						<liveCharts:LineChart Name="LogsPerLevel" Series="{Binding LevelsChart, Converter={StaticResource ToLogLevelSeries}}" 
-											  LineType="Polyline" Hoverable="False" Height="250" Margin="5" LegendLocation="Bottom">
+											  LineSmoothness="1" Hoverable="False" Height="250" Margin="5" LegendLocation="Bottom">
 							<liveCharts:LineChart.AxisY>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1">
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0">
 									<liveCharts:Axis.Separator>
-										<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
+										<liveCharts:Separator Color="#FF404040" IsEnabled="True"></liveCharts:Separator>
 									</liveCharts:Axis.Separator>
 								</liveCharts:Axis>
 							</liveCharts:LineChart.AxisY>
 							<liveCharts:LineChart.AxisX>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" LabelFormatter="{Binding XFormater}">
 									<liveCharts:Axis.Separator>
 										<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
 									</liveCharts:Axis.Separator>
@@ -105,16 +105,16 @@
                         <TextBlock Text="Logs Per Application" TextAlignment="Center" FontSize="16" Foreground="{DynamicResource AccentColorBrush}" />
 
 						<liveCharts:LineChart Name="LogsPerApplication" Series="{Binding ApplicationsChart, Converter={StaticResource ToSeries}}"
-											  LineType="Polyline" Hoverable="False" Height="250" Margin="5" LegendLocation="Bottom">
+											  LineSmoothness="1" Hoverable="False" Height="250" Margin="5" LegendLocation="Bottom">
 							<liveCharts:LineChart.AxisY>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0" Thickness="1">
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True" MinValue="0">
 									<liveCharts:Axis.Separator>
-										<liveCharts:Separator Color="#FF404040" Thickness="1" IsEnabled="True"></liveCharts:Separator>
+										<liveCharts:Separator Color="#FF404040" IsEnabled="True"></liveCharts:Separator>
 									</liveCharts:Axis.Separator>
 								</liveCharts:Axis>
 							</liveCharts:LineChart.AxisY>
 							<liveCharts:LineChart.AxisX>
-								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" Labels="{Binding Charts.Timeline}" Thickness="1" IsEnabled="True">
+								<liveCharts:Axis Foreground="White" Color="#FF404040" FontSize="10" IsEnabled="True">
 									<liveCharts:Axis.Separator>
 										<liveCharts:Separator IsEnabled="False"></liveCharts:Separator>
 									</liveCharts:Axis.Separator>

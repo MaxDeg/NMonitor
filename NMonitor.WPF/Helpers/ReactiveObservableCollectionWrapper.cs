@@ -14,6 +14,9 @@
     limitations under the License.
 ******************************************************************************/
 
+using LiveCharts;
+using LiveCharts.CoreComponents;
+using NMonitor.WPF.ViewModels;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -24,12 +27,20 @@ using System.Threading.Tasks;
 
 namespace NMonitor.WPF.Helpers
 {
-    public class ReactiveObservableCollectionWrapper<TValue> : ObservableCollection<TValue>, IDisposable
+    public class ReactiveObservableCollectionWrapper : SeriesCollection, IDisposable
     {
+		private static readonly SeriesConfiguration<ChartPointViewModel> DefaultConfiguration = new SeriesConfiguration<ChartPointViewModel>();
+
         private List<IDisposable> disposables;
 
-        public ReactiveObservableCollectionWrapper(IReactiveCollection<TValue> list)
-            : base(new List<TValue>())
+		static ReactiveObservableCollectionWrapper()
+		{
+			DefaultConfiguration.Y(model => model.Count);
+			DefaultConfiguration.X(model => model.Time.ToOADate());
+		}
+
+		public ReactiveObservableCollectionWrapper(IReactiveCollection<Series> list)
+            : base(DefaultConfiguration)
         {
             this.disposables = new List<IDisposable>();
 
